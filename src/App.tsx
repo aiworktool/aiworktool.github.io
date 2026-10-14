@@ -26,15 +26,25 @@ function Guarded({ children }: { children: ReactNode }) {
   return <Suspense fallback={<p>正在打开工具…</p>}>{children}</Suspense>;
 }
 
+function toolRoute(path: string, page: ReactNode) {
+  const element = <Guarded>{page}</Guarded>;
+  return (
+    <>
+      <Route path={path} element={element} />
+      <Route path={`${path}/`} element={element} />
+    </>
+  );
+}
+
 export function App() {
   return (
     <AppErrorBoundary>
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/record" element={<Guarded><RecordPage /></Guarded>} />
-          <Route path="/audio-file" element={<Guarded><FilePage /></Guarded>} />
-          <Route path="/matting" element={<Guarded><MattingPage /></Guarded>} />
+          {toolRoute('/record', <RecordPage />)}
+          {toolRoute('/audio-file', <FilePage />)}
+          {toolRoute('/matting', <MattingPage />)}
         </Routes>
       </BrowserRouter>
     </AppErrorBoundary>
