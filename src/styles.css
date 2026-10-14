@@ -168,3 +168,37 @@ footer {
 [role="alert"] {
   color: #8d2b1f;
 }
+
+.json-box {
+  min-height: 16rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.diff-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.diff-list {
+  overflow: auto;
+  max-height: 50vh;
+  padding: 8px;
+  background: #fffdf8;
+  border: 1px solid #ddd4c4;
+  border-radius: 12px;
+}
+
+.diff-line.add {
+  background: #e5f2ea;
+}
+
+.diff-line.remove {
+  background: #f8e4df;
+}
+
+@media (max-width: 720px) {
+  .diff-columns {
+    grid-template-columns: 1fr;
+  }
+}

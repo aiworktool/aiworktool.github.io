@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 
 const dist = join(dirname(fileURLToPath(import.meta.url)), '..', 'dist');
 const index = join(dist, 'index.html');
-const routes = ['record', 'audio-file', 'matting'];
+const routes = ['record', 'audio-file', 'matting', 'json', 'json-diff'];
 
 await copyFile(index, join(dist, '404.html'));
 await writeFile(join(dist, '.nojekyll'), '');

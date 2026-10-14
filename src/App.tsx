@@ -6,6 +6,8 @@ import { HomePage } from './pages/HomePage';
 const RecordPage = lazy(() => import('./pages/RecordPage'));
 const FilePage = lazy(() => import('./pages/FilePage'));
 const MattingPage = lazy(() => import('./matting/MattingPage'));
+const JsonFormatPage = lazy(() => import('./pages/JsonFormatPage'));
+const JsonDiffPage = lazy(() => import('./pages/JsonDiffPage'));
 
 class AppErrorBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
   state = { failed: false };
@@ -36,6 +38,16 @@ function toolRoute(path: string, page: ReactNode) {
   );
 }
 
+function plainRoute(path: string, page: ReactNode) {
+  const element = <Suspense fallback={<p>正在打开工具…</p>}>{page}</Suspense>;
+  return (
+    <>
+      <Route path={path} element={element} />
+      <Route path={`${path}/`} element={element} />
+    </>
+  );
+}
+
 export function App() {
   return (
     <AppErrorBoundary>
@@ -45,6 +57,8 @@ export function App() {
           {toolRoute('/record', <RecordPage />)}
           {toolRoute('/audio-file', <FilePage />)}
           {toolRoute('/matting', <MattingPage />)}
+          {plainRoute('/json', <JsonFormatPage />)}
+          {plainRoute('/json-diff', <JsonDiffPage />)}
         </Routes>
       </BrowserRouter>
     </AppErrorBoundary>

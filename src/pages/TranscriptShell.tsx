@@ -7,6 +7,7 @@ import type { SessionState } from '../transcribe/sessionReducer';
 import { useTranscriptJob } from '../transcribe/useTranscriptJob';
 import { JobProvider } from './jobContext';
 import { SiteFooter } from './SiteFooter';
+import { usePageTitle } from './usePageTitle';
 
 function downloadLabel(state: SessionState): string {
   const loaded = formatBytes(state.downloadLoaded);
@@ -62,6 +63,7 @@ function Editor({
 export function TranscriptShell({ mode, children }: { mode: SourceMode; children: ReactNode }) {
   const job = useTranscriptJob(mode);
   const { state } = job;
+  usePageTitle(TITLES[mode]);
   const busy = state.phase === 'loading' || state.phase === 'transcribing' || state.phase === 'paused';
   const editingLocked = busy || state.phase === 'recording';
 

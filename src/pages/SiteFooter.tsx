@@ -10,7 +10,7 @@ export function SiteFooter() {
       <p>
         抠图模型：MODNet（Apache-2.0），上游 ZHKKKe/MODNet，浏览器权重 Xenova/modnet。
       </p>
-      <p><Link to="/">本地处理</Link></p>
+      <p><Link to="/">便捷工具</Link></p>
     </footer>
   );
 }

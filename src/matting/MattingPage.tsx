@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { formatBytes } from '../format';
 import { MattingClient } from '../gpu/mattingClient';
 import { SiteFooter } from '../pages/SiteFooter';
+import { usePageTitle } from '../pages/usePageTitle';
 import { askPersist } from '../storage/persistStorage';
 import { initialCrop, type Rect } from './crop';
 import { cutoutError, cutoutFile } from './cutoutFile';
@@ -22,6 +23,7 @@ export default function MattingPage() {
   const [total, setTotal] = useState(0);
   const [cached, setCached] = useState(false);
   const [presetId, setPresetId] = useState(PRESETS[0].id);
+  usePageTitle('抠图 / 证件照');
   const [colorId, setColorId] = useState(DEFAULT_BACKGROUND.id);
   const [transparent, setTransparent] = useState(false);
   const [crop, setCrop] = useState<Rect | null>(null);
