@@ -1,0 +1,60 @@
+{
+  "files": [
+    {
+      "path": "Xenova/whisper-base/config.json",
+      "sha256": "d1d347fdb422e6347c2f843a90d375aa67ea3f4b3e20d2c3075f9a9f6243685b"
+    },
+    {
+      "path": "Xenova/whisper-base/generation_config.json",
+      "sha256": "3bba359e33fdd6dc1c10f71846a477d339b0242f462f70ea1dd73274caa38d05"
+    },
+    {
+      "path": "Xenova/whisper-base/preprocessor_config.json",
+      "sha256": "a6a76d28c93edb273669eb9e0b0636a2bddbb1272c3261e47b7ca6dfdbac1b8d"
+    },
+    {
+      "path": "Xenova/whisper-base/tokenizer.json",
+      "sha256": "27fc476bfe7f17299480be2273fc0608e4d5a99aba2ab5dec5374b4482d1a566"
+    },
+    {
+      "path": "Xenova/whisper-base/tokenizer_config.json",
+      "sha256": "2a4c4281cf9f51ac6ccc406fdc711a087afe6530f671fa7b80953edc498275ce"
+    },
+    {
+      "path": "Xenova/whisper-base/vocab.json",
+      "sha256": "50d6a919f0a0601d56a04eb583c780d18553aa388254ba3158eb6a00f13e2c1a"
+    },
+    {
+      "path": "Xenova/whisper-base/merges.txt",
+      "sha256": "2df2990a395e35e8dfbc7511e08c12d56018d8d04691e0133e5d63b21e154dc6"
+    },
+    {
+      "path": "Xenova/whisper-base/normalizer.json",
+      "sha256": "bf1c507dc8724ca9cf9903640dacfb69dae2f00edee4f21ceba106a7392f26dd"
+    },
+    {
+      "path": "Xenova/whisper-base/special_tokens_map.json",
+      "sha256": "e67ae3a0aaa99abcd9f187138e12db1f65c16a14761c50ef10eef2c174a7a691"
+    },
+    {
+      "path": "Xenova/whisper-base/onnx/encoder_model_quantized.onnx",
+      "sha256": "3e345e977b55620a37c0c2b2af0644e019afdfad562dcf71eb929bb7274285f9"
+    },
+    {
+      "path": "Xenova/whisper-base/onnx/decoder_model_merged_quantized.onnx",
+      "sha256": "a6beb6baabb66f00b6a686d828c95ffca6146d51900cbad0266cad38f64cf861"
+    },
+    {
+      "path": "Xenova/modnet/config.json",
+      "sha256": "e144d8af9b1f09649785c77f592a76bbc69504ae02e43700663b2a9f00d9c8a2"
+    },
+    {
+      "path": "Xenova/modnet/preprocessor_config.json",
+      "sha256": "07d83634b1fdd20142ca6e3fe55ab92b558f56d1b0f005ff3a7926f1c9e1165d"
+    },
+    {
+      "path": "Xenova/modnet/onnx/model.onnx",
+      "sha256": "07c308cf0fc7e6e8b2065a12ed7fc07e1de8febb7dc7839d7b7f15dd66584df9"
+    }
+  ]
+}

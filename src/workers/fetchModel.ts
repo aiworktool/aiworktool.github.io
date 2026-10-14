@@ -1,10 +1,14 @@
+import { downloadModelFile, isHtmlResponse } from './downloadModel';
+import { expectedSha256 } from './modelIntegrity';
+
 const CACHE_NAME = 'local-models-v1';
 
 type ProgressFn = (loaded: number, total: number, networkBytes: number) => void;
-
 type FileProgress = { loaded: number; total: number };
+type NativeFetch = typeof fetch;
 
 const files = new Map<string, FileProgress>();
+const inflight = new Map<string, Promise<Response>>();
 let networkBytes = 0;
 let onProgress: ProgressFn | null = null;
 let installed = false;
@@ -30,69 +34,90 @@ function emit(): void {
   onProgress?.(loaded, total, networkBytes);
 }
 
-function concat(parts: Uint8Array[]): Uint8Array {
-  const size = parts.reduce((sum, part) => sum + part.byteLength, 0);
-  const out = new Uint8Array(size);
-  let offset = 0;
-  for (const part of parts) {
-    out.set(part, offset);
-    offset += part.byteLength;
-  }
-  return out;
+function note(url: string, loaded: number, total: number, delta: number): void {
+  networkBytes += delta;
+  files.set(url, { loaded, total: total || loaded });
+  emit();
 }
 
-async function storeResponse(url: string, response: Response, signal?: AbortSignal): Promise<Response> {
-  const total = Number(response.headers.get('content-length') || 0);
-  const body = response.body;
-  if (!body) return response;
-  const reader = body.getReader();
-  const parts: Uint8Array[] = [];
-  let loaded = 0;
-  files.set(url, { loaded: 0, total });
-  while (true) {
-    if (signal?.aborted) {
-      await reader.cancel();
-      throw new DOMException('Aborted', 'AbortError');
-    }
-    const step = await reader.read();
-    if (step.done) break;
-    parts.push(step.value);
-    loaded += step.value.byteLength;
-    networkBytes += step.value.byteLength;
-    files.set(url, { loaded, total: total || loaded });
-    emit();
-  }
-  const bytes = concat(parts);
+function copyBytes(bytes: Uint8Array): ArrayBuffer {
   const payload = new ArrayBuffer(bytes.byteLength);
   new Uint8Array(payload).set(bytes);
-  const headers = new Headers(response.headers);
-  headers.set('content-length', String(payload.byteLength));
-  const stored = new Response(payload, { status: response.status, headers });
-  const cache = await caches.open(CACHE_NAME);
-  await cache.put(url, stored.clone());
-  return stored;
+  return payload;
 }
 
-function isHtml(response: Response): boolean {
-  const type = (response.headers.get('content-type') || '').toLowerCase();
-  return type.includes('text/html');
+async function sha256Hex(bytes: Uint8Array): Promise<string> {
+  const digest = await crypto.subtle.digest('SHA-256', copyBytes(bytes));
+  const hex: string[] = [];
+  for (const byte of new Uint8Array(digest)) hex.push(byte.toString(16).padStart(2, '0'));
+  return hex.join('');
+}
+
+function bytesToResponse(bytes: Uint8Array, contentType: string): Response {
+  const payload = copyBytes(bytes);
+  return new Response(payload, {
+    status: 200,
+    headers: {
+      'content-type': contentType || 'application/octet-stream',
+      'content-length': String(payload.byteLength),
+    },
+  });
 }
 
 async function cachedModel(cache: Cache, url: string): Promise<Response | null> {
   const cached = await cache.match(url);
   if (!cached) return null;
-  if (!isHtml(cached)) return cached;
+  if (!isHtmlResponse(cached)) return cached;
   await cache.delete(url);
   return null;
 }
 
+function callerSignal(init?: RequestInit): AbortSignal | undefined {
+  const signal = init?.signal ?? undefined;
+  if (!activeSignal) return signal;
+  if (!signal) return activeSignal;
+  if (typeof AbortSignal.any === 'function') return AbortSignal.any([activeSignal, signal]);
+  return activeSignal;
+}
+
+async function fetchIntoCache(native: NativeFetch, url: string, signal?: AbortSignal): Promise<Response> {
+  const result = await downloadModelFile(native, url, signal, (loaded, total, delta) => {
+    note(url, loaded, total, delta);
+  });
+  if (result.kind === 'passthrough') return result.response;
+  const expected = expectedSha256(url);
+  if (expected) {
+    const actual = await sha256Hex(result.bytes);
+    if (actual !== expected) throw new Error('model checksum mismatch');
+  }
+  const stored = bytesToResponse(result.bytes, result.contentType);
+  const cache = await caches.open(CACHE_NAME);
+  await cache.put(url, stored.clone());
+  return stored;
+}
+
+async function shareDownload(native: NativeFetch, url: string, signal?: AbortSignal): Promise<Response> {
+  const current = inflight.get(url);
+  if (current) return (await current).clone();
+  const job = fetchIntoCache(native, url, signal);
+  inflight.set(url, job);
+  try {
+    return (await job).clone();
+  } finally {
+    inflight.delete(url);
+  }
+}
+
 async function trackedFetch(
-  native: typeof fetch,
+  native: NativeFetch,
   input: RequestInfo | URL,
   init?: RequestInit,
 ): Promise<Response> {
   const url = requestUrl(input);
-  if (!isModelUrl(url)) return native(input, init);
+  const method = (init?.method || 'GET').toUpperCase();
+  if (!isModelUrl(url) || method !== 'GET') return native(input, init);
+  const signal = callerSignal(init);
+  if (signal?.aborted) throw new DOMException('Aborted', 'AbortError');
   const cache = await caches.open(CACHE_NAME);
   const cached = await cachedModel(cache, url);
   if (cached) {
@@ -101,18 +126,7 @@ async function trackedFetch(
     emit();
     return cached;
   }
-  if (activeSignal?.aborted) throw new DOMException('Aborted', 'AbortError');
-  const response = await native(input, init);
-  if (isHtml(response)) throw new Error('model file was not found locally');
-  if (!response.ok) return response;
-  try {
-    return await storeResponse(url, response, activeSignal ?? init?.signal ?? undefined);
-  } catch (err) {
-    if (err instanceof DOMException && err.name === 'QuotaExceededError') {
-      throw err;
-    }
-    throw err;
-  }
+  return shareDownload(native, url, signal);
 }
 
 export function resetModelProgress(): void {

@@ -6,8 +6,8 @@
   "scripts": {
     "copy-ort": "node scripts/copy-ort.mjs",
     "fetch-models": "node scripts/fetch-models.mjs",
-    "predev": "node scripts/copy-ort.mjs",
-    "prebuild": "node scripts/copy-ort.mjs",
+    "predev": "node scripts/copy-ort.mjs && node scripts/write-integrity.mjs",
+    "prebuild": "node scripts/copy-ort.mjs && node scripts/write-integrity.mjs",
     "dev": "vite",
     "build": "tsc --noEmit && vite build && node scripts/pages-fallback.mjs",
     "check-size": "node scripts/check-home-size.mjs",

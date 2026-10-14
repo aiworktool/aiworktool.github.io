@@ -45,7 +45,8 @@ export function codeOf(err: unknown): ErrorCode {
     msg.includes('404') ||
     msg.includes('not found') ||
     msg.includes('failed to fetch') ||
-    msg.includes('unexpected token')
+    msg.includes('unexpected token') ||
+    msg.includes('checksum')
   ) {
     return 'download-failed';
   }
