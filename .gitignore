@@ -7,3 +7,19 @@ public/fixtures
 .DS_Store
 前端站点.md
 实现方案.md
+
+# 本地栅格图片不上传 GitHub。站点图标 public/favicon.svg 继续保留。
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.webp
+*.bmp
+*.heic
+*.JPG
+*.JPEG
+*.PNG
+*.GIF
+*.WEBP
+*.BMP
+*.HEIC
