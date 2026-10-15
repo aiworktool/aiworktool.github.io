@@ -370,6 +370,11 @@ footer,
   grid-template-columns: 1fr 1fr;
   gap: 12px;
   margin: 0 0 20px;
+  align-items: stretch;
+}
+
+.tool-span {
+  grid-column: 1 / -1;
 }
 
 .tool-card {
