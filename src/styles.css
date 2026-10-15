@@ -47,6 +47,22 @@ a {
   font-weight: 650;
 }
 
+.tool-group {
+  margin: 0 0 10px;
+  font-size: 1.2rem;
+  font-weight: 650;
+}
+
+.tools .tool-entry p {
+  margin: 0.35rem 0 0;
+}
+
+.tool-entry + .tool-entry {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #ddd4c4;
+}
+
 .panel,
 .stage {
   background: #fffdf8;
@@ -174,6 +190,26 @@ footer {
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
 
+.compact-box {
+  min-height: 4.5rem;
+}
+
+.result-box {
+  min-height: 6rem;
+  white-space: pre-wrap;
+  overflow: auto;
+}
+
+.option {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.match-list {
+  padding-left: 1.2rem;
+}
+
 .diff-columns {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -204,8 +240,92 @@ footer {
   background: #e5f2ea;
 }
 
+.time-module > h2 {
+  margin: 0 0 0.6rem;
+  font-size: 1.35rem;
+}
+
+.time-section h2,
+.time-section h3 {
+  margin: 0 0 0.4rem;
+  font-size: 1.05rem;
+}
+
+.time-hint {
+  margin: 0 0 8px;
+  color: #5c564c;
+  font-size: 0.92rem;
+}
+
+.time-list {
+  margin: 8px 0;
+}
+
+.time-row {
+  display: grid;
+  grid-template-columns: 6.5rem minmax(0, 1fr) auto;
+  gap: 8px 10px;
+  align-items: center;
+  margin: 6px 0;
+}
+
+.time-row dt,
+.time-row dd {
+  margin: 0;
+}
+
+.time-value {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-variant-numeric: tabular-nums;
+}
+
+.time-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.duration-fields {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.time-field {
+  display: block;
+  margin: 8px 0;
+  min-width: 0;
+}
+
+.time-field span {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.time-module input[type="text"] {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  font: inherit;
+  padding: 8px;
+  border: 1px solid #ddd4c4;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.time-result {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
 @media (max-width: 720px) {
-  .diff-columns {
+  .diff-columns,
+  .time-fields,
+  .duration-fields,
+  .time-row {
     grid-template-columns: 1fr;
   }
 }

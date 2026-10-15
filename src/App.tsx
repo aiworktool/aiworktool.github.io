@@ -8,6 +8,12 @@ const FilePage = lazy(() => import('./pages/FilePage'));
 const MattingPage = lazy(() => import('./matting/MattingPage'));
 const JsonFormatPage = lazy(() => import('./pages/JsonFormatPage'));
 const JsonDiffPage = lazy(() => import('./pages/JsonDiffPage'));
+const TimePage = lazy(() => import('./pages/TimePage'));
+const Base64Page = lazy(() => import('./pages/Base64Page'));
+const UrlCodecPage = lazy(() => import('./pages/UrlCodecPage'));
+const Sha256Page = lazy(() => import('./pages/Sha256Page'));
+const JwtPage = lazy(() => import('./pages/JwtPage'));
+const RegexPage = lazy(() => import('./pages/RegexPage'));
 
 class AppErrorBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
   state = { failed: false };
@@ -59,6 +65,12 @@ export function App() {
           {toolRoute('/matting', <MattingPage />)}
           {plainRoute('/json', <JsonFormatPage />)}
           {plainRoute('/json-diff', <JsonDiffPage />)}
+          {plainRoute('/time', <TimePage />)}
+          {plainRoute('/base64', <Base64Page />)}
+          {plainRoute('/url', <UrlCodecPage />)}
+          {plainRoute('/sha256', <Sha256Page />)}
+          {plainRoute('/jwt', <JwtPage />)}
+          {plainRoute('/regex', <RegexPage />)}
         </Routes>
       </BrowserRouter>
     </AppErrorBoundary>
