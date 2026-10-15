@@ -27,7 +27,7 @@ export function HomePage() {
           <p className="tool-group">URL 比较</p>
           <div className="tool-entry">
             <Link to="/url-diff">URL 参数比较</Link>
-            <p>把两边的请求参数拆开，逐项对照差异。</p>
+            <p>拆开域名、路径和请求参数，逐项对照。</p>
           </div>
         </li>
       </ul>

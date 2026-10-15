@@ -3,29 +3,48 @@ import { compareUrlStatusText, compareUrls, type UrlRow } from '../url/diffUrl';
 import { DiffLines } from './DiffLines';
 import { ToolPage } from './ToolPage';
 
+function CompareBlock({ title, rows, empty }: { title: string; rows: UrlRow[]; empty?: string }) {
+  if (rows.length === 0 && !empty) return null;
+  return (
+    <>
+      <h2>{title}</h2>
+      {rows.length === 0 ? <p>{empty}</p> : (
+        <div className="diff-columns">
+          <DiffLines rows={rows} side="left" label={`左边的${title}`} />
+          <DiffLines rows={rows} side="right" label={`右边的${title}`} />
+        </div>
+      )}
+    </>
+  );
+}
+
 export default function UrlDiffPage() {
   const [left, setLeft] = useState('');
   const [right, setRight] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [summary, setSummary] = useState<string | null>(null);
-  const [addresses, setAddresses] = useState<string | null>(null);
-  const [rows, setRows] = useState<UrlRow[]>([]);
+  const [domainRows, setDomainRows] = useState<UrlRow[]>([]);
+  const [paramRows, setParamRows] = useState<UrlRow[]>([]);
+  const [compared, setCompared] = useState(false);
 
   function compare() {
     const result = compareUrls(left, right);
     if (!result.ok) {
       setError(result.message);
       setSummary(null);
-      setAddresses(null);
-      setRows([]);
+      setDomainRows([]);
+      setParamRows([]);
+      setCompared(false);
       return;
     }
     setError(null);
     setSummary(compareUrlStatusText(result.status));
-    const showAddress = result.status === 'address' || result.status === 'params-address';
-    setAddresses(showAddress ? `左边：${result.leftAddress}\n右边：${result.rightAddress}` : null);
-    setRows(result.status === 'params' || result.status === 'params-address' ? result.rows : []);
+    setDomainRows(result.domainRows);
+    setParamRows(result.paramRows);
+    setCompared(true);
   }
+
+  const paramEmpty = compared && paramRows.length === 0 ? '两边都没有请求参数。' : undefined;
 
   return (
     <ToolPage title="URL 参数比较" note="这两段地址只在本机比较，不上传。">
@@ -52,13 +71,8 @@ export default function UrlDiffPage() {
       </div>
       {error && <p role="alert">{error}</p>}
       {summary && <p>{summary}</p>}
-      {addresses && <pre className="json-box result-box">{addresses}</pre>}
-      {rows.length > 0 && (
-        <div className="diff-columns">
-          <DiffLines rows={rows} side="left" label="左边的参数" />
-          <DiffLines rows={rows} side="right" label="右边的参数" />
-        </div>
-      )}
+      <CompareBlock title="域名和路径" rows={domainRows} />
+      <CompareBlock title="请求参数" rows={paramRows} empty={paramEmpty} />
     </ToolPage>
   );
 }
