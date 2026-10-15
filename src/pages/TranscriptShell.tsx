@@ -6,7 +6,7 @@ import type { ModelChoice, Segment, SourceMode } from '../transcribe/types';
 import type { SessionState } from '../transcribe/sessionReducer';
 import { useTranscriptJob } from '../transcribe/useTranscriptJob';
 import { JobProvider } from './jobContext';
-import { SiteFooter } from './SiteFooter';
+import { SiteFooter, WhisperNote } from './SiteFooter';
 import { usePageTitle } from './usePageTitle';
 
 function downloadLabel(state: SessionState): string {
@@ -156,6 +156,7 @@ export function TranscriptShell({ mode, children }: { mode: SourceMode; children
             </div>
           </section>
         )}
+        <WhisperNote />
         <SiteFooter />
       </main>
     </JobProvider>

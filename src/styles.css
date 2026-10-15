@@ -175,10 +175,15 @@ textarea {
   background: #1f6b4a;
 }
 
-footer {
+footer,
+.model-note {
   margin-top: 40px;
   color: #5c564c;
   font-size: 0.92rem;
+}
+
+.tools .model-note {
+  margin: 0.5rem 0 0;
 }
 
 [role="alert"] {

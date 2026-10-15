@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { formatBytes } from '../format';
 import { MattingClient } from '../gpu/mattingClient';
-import { SiteFooter } from '../pages/SiteFooter';
+import { ModnetNote, SiteFooter } from '../pages/SiteFooter';
 import { usePageTitle } from '../pages/usePageTitle';
 import { askPersist } from '../storage/persistStorage';
 import { initialCrop, type Rect } from './crop';
@@ -105,6 +105,7 @@ export default function MattingPage() {
           onCrop={setCrop}
         />
       )}
+      <ModnetNote />
       <SiteFooter />
     </main>
   );
