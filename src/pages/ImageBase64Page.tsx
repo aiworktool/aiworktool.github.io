@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { imageDataUrl, imageFileError } from '../image/imageBase64';
+import { FilePicker } from './FilePicker';
 import { CopyButton } from './TimeBits';
 import { ToolPage } from './ToolPage';
 import { useI18n } from './useI18n';
@@ -48,10 +49,10 @@ export default function ImageBase64Page() {
 
   return (
     <ToolPage title={copy.title} note={copy.note}>
-      <label className="time-field">
+      <div className="time-field">
         <span>{copy.choose}</span>
-        <input type="file" accept="image/*" onChange={(event) => choose(event.target.files?.[0])} />
-      </label>
+        <FilePicker accept="image/*" fileName={file?.name ?? ''} onFile={choose} />
+      </div>
       <div className="row">
         <button type="button" onClick={toBase64} disabled={!file}>{copy.toBase64}</button>
       </div>

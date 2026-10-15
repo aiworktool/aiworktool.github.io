@@ -8,6 +8,8 @@ export const zh = {
   opening: '正在打开工具…',
   localText: '这段文字只在本机处理，不上传。',
   pasteFirst: '请先粘贴内容。',
+  chooseFile: '选择文件',
+  noFile: '未选择任何文件',
   home: {
     privacy: '文字、图片和音频只在这台电脑的浏览器里处理，不上传。',
     jsonGroup: 'JSON',

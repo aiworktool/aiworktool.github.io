@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { codeOf, errorText } from '../errors';
-import { fill } from '../i18n/lang';
 import { loadAudioBlob } from './audioDecode';
+import { FilePicker } from '../pages/FilePicker';
 import { useJob } from '../pages/jobContext';
 import { useI18n } from '../pages/useI18n';
 
@@ -17,9 +17,9 @@ export function FilePanel() {
 
   async function take(file: File | undefined) {
     if (!file || busy) return;
+    setName(file.name);
     try {
       const decoded = await loadAudioBlob(file);
-      setName(file.name);
       job.takeAudio(decoded.pcm, decoded.durationSec, false);
     } catch (err) {
       job.fail(errorText(codeOf(err), 'audio'));
@@ -36,16 +36,12 @@ export function FilePanel() {
       }}
     >
       <p>{m.record.drop}</p>
-      <input
-        type="file"
+      <FilePicker
         accept="audio/*,.mp3,.wav,.m4a,.webm"
         disabled={busy}
-        onChange={(event) => {
-          void take(event.target.files?.[0]);
-          event.target.value = '';
-        }}
+        fileName={name}
+        onFile={(file) => void take(file)}
       />
-      {name && <p>{fill(m.record.selected, { name })}</p>}
     </section>
   );
 }

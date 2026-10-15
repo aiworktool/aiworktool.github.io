@@ -10,6 +10,8 @@ export const en: Copy = {
   opening: 'Opening the tool…',
   localText: 'This text stays on this device and is not uploaded.',
   pasteFirst: 'Paste something first.',
+  chooseFile: 'Choose file',
+  noFile: 'No file chosen',
   home: {
     privacy: 'Text, images, and audio stay in this browser. Nothing is uploaded.',
     jsonGroup: 'JSON',

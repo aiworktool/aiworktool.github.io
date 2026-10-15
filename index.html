@@ -4,6 +4,15 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>便捷工具</title>
+    <script>
+      (function () {
+        var path = location.pathname;
+        if (path === '/en' || path.indexOf('/en/') === 0) {
+          document.documentElement.lang = 'en';
+          document.title = 'Handy Tools';
+        }
+      })();
+    </script>
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <script
       async

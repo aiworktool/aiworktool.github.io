@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { formatBytes } from '../format';
 import { MattingClient } from '../gpu/mattingClient';
+import { FilePicker } from '../pages/FilePicker';
 import { ModnetNote, SiteFooter } from '../pages/SiteFooter';
 import { useI18n } from '../pages/useI18n';
 import { usePageTitle } from '../pages/usePageTitle';
@@ -132,24 +133,28 @@ function FileDrop({
   onFile: (file: File | undefined) => void;
   hint: string;
 }) {
+  const [name, setName] = useState('');
+
+  function pick(file: File | undefined) {
+    setName(file?.name ?? '');
+    onFile(file);
+  }
+
   return (
     <section
       className="panel drop"
       onDragOver={(event) => event.preventDefault()}
       onDrop={(event) => {
         event.preventDefault();
-        if (!disabled) onFile(event.dataTransfer.files[0]);
+        if (!disabled) pick(event.dataTransfer.files[0]);
       }}
     >
       <p>{hint}</p>
-      <input
-        type="file"
+      <FilePicker
         accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp"
         disabled={disabled}
-        onChange={(event) => {
-          onFile(event.target.files?.[0]);
-          event.target.value = '';
-        }}
+        fileName={name}
+        onFile={pick}
       />
     </section>
   );
