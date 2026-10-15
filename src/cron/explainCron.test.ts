@@ -21,6 +21,15 @@ describe('explainCron', () => {
     expect(result.next[0]).toContain('00:00:00');
   });
 
+  it('accepts weekday and month names', () => {
+    const result = explainCron('0 9 * * MON-FRI', 'zh', from);
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.fields[4].text).toContain('1,2,3,4,5');
+    expect(result.next[0]).toContain('09:00:00');
+    expect(explainCron('0 0 1 JAN *', 'zh', from).ok).toBe(true);
+  });
+
   it('rejects an expression that is not five fields', () => {
     expect(explainCron('* * *', 'zh', from).ok).toBe(false);
     expect(explainCron('60 * * * *', 'zh', from).ok).toBe(false);

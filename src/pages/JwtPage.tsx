@@ -3,6 +3,7 @@ import { decodeJwt, type JwtView } from '../codec/jwt';
 import { CodecBox } from './CodecBox';
 import { ToolPage } from './ToolPage';
 import { useI18n } from './useI18n';
+import { useLangChange } from './useLangChange';
 
 export default function JwtPage() {
   const { m, lang } = useI18n();
@@ -10,6 +11,9 @@ export default function JwtPage() {
   const [text, setText] = useState('');
   const [view, setView] = useState<JwtView | null>(null);
   const [error, setError] = useState<string | null>(null);
+  useLangChange(() => {
+    if (error) run();
+  });
 
   function run() {
     const next = decodeJwt(text, lang);

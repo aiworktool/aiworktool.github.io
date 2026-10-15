@@ -3,6 +3,7 @@ import { sha256Hex } from '../codec/sha256';
 import { CodecBox, CopyResult } from './CodecBox';
 import { ToolPage } from './ToolPage';
 import { useI18n } from './useI18n';
+import { useLangChange } from './useLangChange';
 
 export default function Sha256Page() {
   const { m, lang } = useI18n();
@@ -10,6 +11,9 @@ export default function Sha256Page() {
   const [text, setText] = useState('');
   const [result, setResult] = useState('');
   const [error, setError] = useState<string | null>(null);
+  useLangChange(() => {
+    if (error) void run();
+  });
 
   async function run() {
     const next = await sha256Hex(text, lang);

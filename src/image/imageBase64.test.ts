@@ -8,6 +8,9 @@ describe('image base64', () => {
     const result = imageDataUrl(PNG);
     expect(result.ok && result.url.startsWith('data:image/png;base64,')).toBe(true);
     expect(imageDataUrl('not base64').ok).toBe(false);
+    const jpeg = imageDataUrl('/9j/4AAQSkZJRgABAQAAAQABAAD/2w==');
+    expect(jpeg.ok && jpeg.url.startsWith('data:image/jpeg;base64,')).toBe(true);
+    expect(imageDataUrl('aaaa').ok).toBe(false);
   });
 
   it('rejects a file that is not an image or is over 2 MB', () => {

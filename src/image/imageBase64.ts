@@ -22,7 +22,9 @@ export function imageDataUrl(
   if (!/^[A-Za-z0-9+/]+={0,2}$/.test(compact) || compact.length % 4 !== 0) {
     return { ok: false, message: copy.bad };
   }
-  return sizedUrl(`data:image/png;base64,${compact}`, compact, copy.tooBig, copy.bad);
+  const mime = sniffMime(compact);
+  if (!mime) return { ok: false, message: copy.bad };
+  return sizedUrl(`data:${mime};base64,${compact}`, compact, copy.tooBig, copy.bad);
 }
 
 function sizedUrl(
@@ -39,6 +41,26 @@ function sizedUrl(
 
 function payloadOf(dataUrl: string): string {
   return dataUrl.slice(dataUrl.indexOf(',') + 1).replace(/\s/g, '');
+}
+
+function sniffMime(payload: string): string | null {
+  const bytes = decodeHead(payload);
+  if (!bytes) return null;
+  if (bytes.startsWith('\x89PNG')) return 'image/png';
+  if (bytes.charCodeAt(0) === 0xff && bytes.charCodeAt(1) === 0xd8) return 'image/jpeg';
+  if (bytes.startsWith('GIF87a') || bytes.startsWith('GIF89a')) return 'image/gif';
+  if (bytes.startsWith('RIFF') && bytes.slice(8, 12) === 'WEBP') return 'image/webp';
+  return null;
+}
+
+function decodeHead(payload: string): string | null {
+  const sample = payload.slice(0, 32);
+  const padded = sample + '='.repeat((4 - (sample.length % 4)) % 4);
+  try {
+    return atob(padded);
+  } catch {
+    return null;
+  }
 }
 
 function decodedSize(payload: string): number {

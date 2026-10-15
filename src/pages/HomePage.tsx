@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { SiteFooter, ModnetNote, WhisperNote } from './SiteFooter';
+import { SiteFooter } from './SiteFooter';
 import { TimeTools } from './TimeTools';
 import { useI18n } from './useI18n';
 import { usePageTitle } from './usePageTitle';
 
-type Card = { name: string; note: string; href: string; extra?: 'whisper' | 'modnet' };
+type Card = { name: string; note: string; href: string };
 type Entry = { kind: 'card'; card: Card } | { kind: 'clock' };
 
 export function HomePage() {
@@ -17,7 +17,11 @@ export function HomePage() {
     const needle = query.trim().toLowerCase();
     return !needle || name.toLowerCase().includes(needle) || note.toLowerCase().includes(needle);
   };
-  const showClock = hit(m.time.title, m.time.placeholder);
+  const clockText = [
+    m.time.title, m.time.placeholder, m.time.hint, m.time.convert, m.time.now,
+    m.time.local, m.time.beijing, m.time.tokyo, m.time.newYork,
+  ];
+  const showClock = clockText.some((part) => hit(part, ''));
   const visible = catalog(home, to).filter((entry) => (
     entry.kind === 'clock' ? showClock : hit(entry.card.name, entry.card.note)
   ));
@@ -51,16 +55,14 @@ function ToolCard({ card }: { card: Card }) {
     <Link className="tool-card" to={card.href}>
       <strong>{card.name}</strong>
       <p>{card.note}</p>
-      {card.extra === 'whisper' && <WhisperNote />}
-      {card.extra === 'modnet' && <ModnetNote />}
     </Link>
   );
 }
 
 function catalog(home: ReturnType<typeof useI18n>['m']['home'], to: (path: string) => string): Entry[] {
-  const card = (name: string, note: string, path: string, extra?: Card['extra']): Entry => ({
+  const card = (name: string, note: string, path: string): Entry => ({
     kind: 'card',
-    card: { name, note, href: to(path), extra },
+    card: { name, note, href: to(path) },
   });
   return [
     card(home.jsonFormat, home.jsonFormatNote, '/json'),
@@ -78,9 +80,9 @@ function catalog(home: ReturnType<typeof useI18n>['m']['home'], to: (path: strin
     card(home.password, home.passwordNote, '/password'),
     card(home.image64, home.image64Note, '/image-base64'),
     card(home.color, home.colorNote, '/color'),
+    card(home.record, home.recordNote, '/record'),
+    card(home.file, home.fileNote, '/audio-file'),
     card(home.regex, home.regexNote, '/regex'),
-    card(home.record, home.recordNote, '/record', 'whisper'),
-    card(home.file, home.fileNote, '/audio-file', 'whisper'),
-    card(home.matting, home.mattingNote, '/matting', 'modnet'),
+    card(home.matting, home.mattingNote, '/matting'),
   ];
 }

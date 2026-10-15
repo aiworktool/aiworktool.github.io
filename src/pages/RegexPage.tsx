@@ -4,6 +4,7 @@ import { fill } from '../i18n/lang';
 import { CodecBox } from './CodecBox';
 import { ToolPage } from './ToolPage';
 import { useI18n } from './useI18n';
+import { useLangChange } from './useLangChange';
 
 const EMPTY_FLAGS: RegexFlags = { global: true, ignoreCase: false, multiline: false };
 
@@ -25,6 +26,9 @@ export default function RegexPage() {
   const [matches, setMatches] = useState<RegexMatch[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const workerRef = useRef<Worker | null>(null);
+  useLangChange(() => {
+    if (error) run();
+  });
 
   useEffect(() => () => workerRef.current?.terminate(), []);
 

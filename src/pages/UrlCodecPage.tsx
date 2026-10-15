@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { decodeUrl, encodeUrl } from '../codec/urlCodec';
 import { CodecBox, CopyResult } from './CodecBox';
 import { ToolPage } from './ToolPage';
 import { useI18n } from './useI18n';
+import { useLangChange } from './useLangChange';
 
 export default function UrlCodecPage() {
   const { m, lang } = useI18n();
@@ -10,8 +11,13 @@ export default function UrlCodecPage() {
   const [text, setText] = useState('');
   const [result, setResult] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const modeRef = useRef<'encode' | 'decode' | null>(null);
+  useLangChange(() => {
+    if (error && modeRef.current) run(modeRef.current);
+  });
 
   function run(mode: 'encode' | 'decode') {
+    modeRef.current = mode;
     const next = mode === 'encode' ? encodeUrl(text, lang) : decodeUrl(text, lang);
     if (!next.ok) {
       setResult('');

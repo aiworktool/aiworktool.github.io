@@ -335,6 +335,7 @@ export const en: Copy = {
     generate: 'Generate',
     badLength: 'Enter a whole number from 8 to 64.',
     needSet: 'Choose at least one character set.',
+    omit: 'Ambiguous characters are left out: 0, O, 1, l, and I.',
   },
   image64: {
     title: 'Image Base64',

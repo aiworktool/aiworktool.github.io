@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { imageDataUrl, imageFileError } from '../image/imageBase64';
 import { FilePicker } from './FilePicker';
 import { CopyButton } from './TimeBits';
 import { ToolPage } from './ToolPage';
 import { useI18n } from './useI18n';
+import { useLangChange } from './useLangChange';
 
 export default function ImageBase64Page() {
   const { m, lang } = useI18n();
@@ -13,9 +14,16 @@ export default function ImageBase64Page() {
   const [source, setSource] = useState('');
   const [preview, setPreview] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const picked = useRef<File | undefined>(undefined);
+  useLangChange(() => {
+    if (!error) return;
+    if (source.trim()) fromBase64();
+    else if (picked.current) choose(picked.current);
+  });
 
   function choose(next: File | undefined) {
     if (!next) return;
+    picked.current = next;
     const message = imageFileError(next, lang);
     setError(message);
     setFile(message ? null : next);
@@ -49,10 +57,17 @@ export default function ImageBase64Page() {
 
   return (
     <ToolPage title={copy.title} note={copy.note}>
-      <div className="time-field">
-        <span>{copy.choose}</span>
+      <section
+        className="panel drop"
+        onDragOver={(event) => event.preventDefault()}
+        onDrop={(event) => {
+          event.preventDefault();
+          choose(event.dataTransfer.files[0]);
+        }}
+      >
+        <p>{copy.choose}</p>
         <FilePicker accept="image/*" fileName={file?.name ?? ''} onFile={choose} />
-      </div>
+      </section>
       <div className="row">
         <button type="button" onClick={toBase64} disabled={!file}>{copy.toBase64}</button>
       </div>
@@ -74,7 +89,17 @@ export default function ImageBase64Page() {
         <button type="button" onClick={fromBase64}>{copy.fromBase64}</button>
       </div>
       {error && <p role="alert">{error}</p>}
-      {preview && <img className="preview-image" src={preview} alt={copy.alt} />}
+      {preview && (
+        <img
+          className="preview-image"
+          src={preview}
+          alt={copy.alt}
+          onError={() => {
+            setPreview(null);
+            setError(copy.bad);
+          }}
+        />
+      )}
     </ToolPage>
   );
 }

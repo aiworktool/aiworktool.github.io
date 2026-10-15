@@ -325,6 +325,7 @@ export const zh = {
     generate: '生成',
     badLength: '长度请填 8 到 64 的整数。',
     needSet: '请至少选一种字符。',
+    omit: '已去掉容易看混的字符：0、O、1、l、I。',
   },
   image64: {
     title: '图片 Base64',

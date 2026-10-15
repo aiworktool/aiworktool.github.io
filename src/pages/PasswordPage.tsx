@@ -3,6 +3,7 @@ import { makePassword, type PasswordSets } from '../id/makeId';
 import { CopyButton } from './TimeBits';
 import { ToolPage } from './ToolPage';
 import { useI18n } from './useI18n';
+import { useLangChange } from './useLangChange';
 
 const INITIAL: PasswordSets = { upper: true, lower: true, digit: true, symbol: true };
 
@@ -17,6 +18,10 @@ export default function PasswordPage() {
   function toggle(key: keyof PasswordSets) {
     setSets((current) => ({ ...current, [key]: !current[key] }));
   }
+
+  useLangChange(() => {
+    if (error) generate();
+  });
 
   function generate() {
     const result = makePassword(Number(length), sets, lang);
@@ -41,6 +46,7 @@ export default function PasswordPage() {
         <SetBox name={copy.digit} checked={sets.digit} onChange={() => toggle('digit')} />
         <SetBox name={copy.symbol} checked={sets.symbol} onChange={() => toggle('symbol')} />
       </div>
+      <p>{copy.omit}</p>
       <div className="row">
         <button type="button" onClick={generate}>{copy.generate}</button>
         {value && <CopyButton label={copy.generate} text={value} />}

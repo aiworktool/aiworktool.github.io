@@ -3,6 +3,8 @@ import { text } from '../i18n/text';
 import { formatLocal } from '../time/timeTools';
 
 const YEAR_MINUTES = 366 * 24 * 60;
+const MONTHS = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+const DAYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
 
 type Field = { raw: string; values: number[]; any: boolean };
 
@@ -17,7 +19,7 @@ export function explainCron(input: string, lang: Lang = 'zh', from = new Date())
   const minute = parseField(parts[0], 0, 59);
   const hour = parseField(parts[1], 0, 23);
   const day = parseField(parts[2], 1, 31);
-  const month = parseField(parts[3], 1, 12);
+  const month = parseField(parts[3], 1, 12, MONTHS);
   const week = parseWeek(parts[4]);
   if (!minute || !hour || !day || !month || !week) return { ok: false, message: copy.bad };
   const labels = [copy.minute, copy.hour, copy.day, copy.month, copy.week];
@@ -67,16 +69,23 @@ function matches(
 
 function parseWeek(raw: string): Field | null {
   if (raw === '*') return { raw, values: [0, 1, 2, 3, 4, 5, 6], any: true };
-  const values = expand(raw, 0, 7);
+  const values = expand(withNames(raw, DAYS, 0), 0, 7);
   if (!values) return null;
   const days = [...new Set(values.map((value) => (value === 7 ? 0 : value)))].sort((a, b) => a - b);
   return { raw, values: days, any: false };
 }
 
-function parseField(raw: string, min: number, max: number): Field | null {
-  const values = expand(raw, min, max);
+function parseField(raw: string, min: number, max: number, names?: string[]): Field | null {
+  const values = expand(names ? withNames(raw, names, 1) : raw, min, max);
   if (!values) return null;
   return { raw, values, any: raw === '*' };
+}
+
+function withNames(raw: string, names: string[], offset: number): string {
+  return raw.replace(/[A-Za-z]{3,}/g, (word) => {
+    const index = names.indexOf(word.toLowerCase().slice(0, 3));
+    return index < 0 ? word : String(index + offset);
+  });
 }
 
 function expand(raw: string, min: number, max: number): number[] | null {

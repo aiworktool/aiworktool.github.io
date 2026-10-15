@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { decodeBase64, encodeBase64 } from '../codec/base64';
 import { CodecBox, CopyResult } from './CodecBox';
 import { ToolPage } from './ToolPage';
 import { useI18n } from './useI18n';
+import { useLangChange } from './useLangChange';
 
 export default function Base64Page() {
   const { m, lang } = useI18n();
@@ -11,8 +12,13 @@ export default function Base64Page() {
   const [urlSafe, setUrlSafe] = useState(false);
   const [result, setResult] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const modeRef = useRef<'encode' | 'decode' | null>(null);
+  useLangChange(() => {
+    if (error && modeRef.current) run(modeRef.current);
+  });
 
   function run(mode: 'encode' | 'decode') {
+    modeRef.current = mode;
     const next = mode === 'encode' ? encodeBase64(text, urlSafe, lang) : decodeBase64(text, urlSafe, lang);
     if (!next.ok) {
       setResult('');
