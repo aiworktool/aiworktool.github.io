@@ -2,22 +2,11 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { compareJsonText, compareStatusText, type SideRow } from '../json/diffJson';
 import { formatJsonText } from '../json/formatJson';
+import { DiffLines } from './DiffLines';
 import { SiteFooter } from './SiteFooter';
 import { usePageTitle } from './usePageTitle';
 
 const TITLE = 'JSON 格式化比较';
-
-function AlignedBox({ rows, side, label }: { rows: SideRow[]; side: 'left' | 'right'; label: string }) {
-  return (
-    <pre className="json-box aligned-box" aria-label={label}>
-      {rows.map((row, index) => (
-        <div key={index} className={row.changed ? `diff-mark ${side}` : 'diff-mark'}>
-          {row[side] || ' '}
-        </div>
-      ))}
-    </pre>
-  );
-}
 
 export default function JsonDiffPage() {
   const [left, setLeft] = useState('');
@@ -66,7 +55,7 @@ export default function JsonDiffPage() {
       <p className="privacy">这两段文字只在本机处理，不上传。</p>
       <div className="diff-columns">
         {marked ? (
-          <AlignedBox rows={rows} side="left" label="左边的 JSON" />
+          <DiffLines rows={rows} side="left" label="左边的 JSON" />
         ) : (
           <textarea
             className="json-box"
@@ -78,7 +67,7 @@ export default function JsonDiffPage() {
           />
         )}
         {marked ? (
-          <AlignedBox rows={rows} side="right" label="右边的 JSON" />
+          <DiffLines rows={rows} side="right" label="右边的 JSON" />
         ) : (
           <textarea
             className="json-box"

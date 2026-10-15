@@ -1,18 +1,7 @@
 import { useState } from 'react';
 import { compareUrlStatusText, compareUrls, type UrlRow } from '../url/diffUrl';
+import { DiffLines } from './DiffLines';
 import { ToolPage } from './ToolPage';
-
-function ParamBox({ rows, side, label }: { rows: UrlRow[]; side: 'left' | 'right'; label: string }) {
-  return (
-    <pre className="json-box aligned-box" aria-label={label}>
-      {rows.map((row, index) => (
-        <div key={index} className={row.changed ? `diff-mark ${side}` : 'diff-mark'}>
-          {row[side] || ' '}
-        </div>
-      ))}
-    </pre>
-  );
-}
 
 export default function UrlDiffPage() {
   const [left, setLeft] = useState('');
@@ -66,8 +55,8 @@ export default function UrlDiffPage() {
       {addresses && <pre className="json-box result-box">{addresses}</pre>}
       {rows.length > 0 && (
         <div className="diff-columns">
-          <ParamBox rows={rows} side="left" label="左边的参数" />
-          <ParamBox rows={rows} side="right" label="右边的参数" />
+          <DiffLines rows={rows} side="left" label="左边的参数" />
+          <DiffLines rows={rows} side="right" label="右边的参数" />
         </div>
       )}
     </ToolPage>

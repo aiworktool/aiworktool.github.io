@@ -245,6 +245,20 @@ footer,
   background: #e5f2ea;
 }
 
+.diff-char {
+  color: inherit;
+  padding: 0 1px;
+  border-radius: 2px;
+}
+
+.diff-char.left {
+  background: #e07058;
+}
+
+.diff-char.right {
+  background: #4caf80;
+}
+
 .time-module > h2 {
   margin: 0 0 0.6rem;
   font-size: 1.35rem;
