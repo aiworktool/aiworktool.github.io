@@ -1,15 +1,6 @@
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useState } from 'react';
 import { copyText } from '../format';
 import { INPUT_MAX_CHARS, type InstantView } from '../time/timeTools';
-
-export function useNow(): number {
-  const [now, setNow] = useState(() => Date.now());
-  useEffect(() => {
-    const id = window.setInterval(() => setNow(Date.now()), 1000);
-    return () => window.clearInterval(id);
-  }, []);
-  return now;
-}
 
 export function useTextField() {
   const [text, setText] = useState('');
@@ -67,23 +58,5 @@ export function ValueList({ rows }: { rows: { label: string; value: string }[] }
         </div>
       ))}
     </dl>
-  );
-}
-
-export function TimeSection({
-  title,
-  level,
-  children,
-}: {
-  title: string;
-  level: 'h2' | 'h3';
-  children: ReactNode;
-}) {
-  const Title = level;
-  return (
-    <section className="time-section">
-      <Title>{title}</Title>
-      {children}
-    </section>
   );
 }
