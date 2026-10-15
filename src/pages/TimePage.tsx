@@ -1,17 +1,17 @@
 import { Link } from 'react-router-dom';
 import { SiteFooter } from './SiteFooter';
 import { TimeTools } from './TimeTools';
+import { useI18n } from './useI18n';
 import { usePageTitle } from './usePageTitle';
 
-const TITLE = '时间工具';
-
 export default function TimePage() {
-  usePageTitle(TITLE);
+  const { m, to } = useI18n();
+  usePageTitle(m.time.title);
   return (
     <main>
-      <p><Link to="/">返回首页</Link></p>
-      <h1>{TITLE}</h1>
-      <p className="privacy">这些时间只在本机计算，不上传。</p>
+      <p><Link to={to('/')}>{m.backHome}</Link></p>
+      <h1>{m.time.title}</h1>
+      <p className="privacy">{m.time.privacy}</p>
       <TimeTools />
       <SiteFooter />
     </main>

@@ -2,14 +2,17 @@ import { useState } from 'react';
 import { decodeUrl, encodeUrl } from '../codec/urlCodec';
 import { CodecBox, CopyResult } from './CodecBox';
 import { ToolPage } from './ToolPage';
+import { useI18n } from './useI18n';
 
 export default function UrlCodecPage() {
+  const { m, lang } = useI18n();
+  const copy = m.urlCodec;
   const [text, setText] = useState('');
   const [result, setResult] = useState('');
   const [error, setError] = useState<string | null>(null);
 
   function run(mode: 'encode' | 'decode') {
-    const next = mode === 'encode' ? encodeUrl(text) : decodeUrl(text);
+    const next = mode === 'encode' ? encodeUrl(text, lang) : decodeUrl(text, lang);
     if (!next.ok) {
       setResult('');
       setError(next.message);
@@ -20,11 +23,11 @@ export default function UrlCodecPage() {
   }
 
   return (
-    <ToolPage title="URL 编码" note="按查询参数的规则处理，空格会变成 %20。这不是给整段网址用的。文字只在本机处理，不上传。">
-      <CodecBox text={text} setText={setText} placeholder="在这里粘贴查询参数" label="URL 编码输入" />
+    <ToolPage title={copy.title} note={copy.note}>
+      <CodecBox text={text} setText={setText} placeholder={copy.placeholder} label={copy.label} />
       <div className="row">
-        <button type="button" onClick={() => run('encode')}>编码</button>
-        <button type="button" onClick={() => run('decode')}>解码</button>
+        <button type="button" onClick={() => run('encode')}>{copy.encode}</button>
+        <button type="button" onClick={() => run('decode')}>{copy.decode}</button>
       </div>
       {error && <p role="alert">{error}</p>}
       {result && <CopyResult text={result} />}

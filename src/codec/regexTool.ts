@@ -1,3 +1,5 @@
+import { fill, type Lang } from '../i18n/lang';
+import { text } from '../i18n/text';
 import { REGEX_PATTERN_MAX, REGEX_TEXT_MAX, rejectLength } from './result';
 
 export type RegexFlags = { global: boolean; ignoreCase: boolean; multiline: boolean };
@@ -13,31 +15,33 @@ function flagText(flags: RegexFlags): string {
   return `${flags.global ? 'g' : ''}${flags.ignoreCase ? 'i' : ''}${flags.multiline ? 'm' : ''}`;
 }
 
-function collect(pattern: RegExp, text: string): RegexResult {
+function collect(pattern: RegExp, source: string, lang: Lang): RegexResult {
+  const copy = text(lang).regex;
   const matches: RegexMatch[] = [];
   const started = performance.now();
-  let found = pattern.exec(text);
+  let found = pattern.exec(source);
   while (found) {
-    if (matches.length >= MAX_MATCHES) return { ok: false, message: '匹配超过 200 次，已停止。' };
-    if (performance.now() - started > MAX_MS) return { ok: false, message: '表达式可能过慢，已停止。' };
+    if (matches.length >= MAX_MATCHES) return { ok: false, message: copy.tooMany };
+    if (performance.now() - started > MAX_MS) return { ok: false, message: copy.slow };
     matches.push({ text: found[0], groups: found.slice(1).map((group) => group ?? '') });
     if (!pattern.global) break;
     if (found[0] === '') pattern.lastIndex += 1;
-    found = pattern.exec(text);
+    found = pattern.exec(source);
   }
   return { ok: true, matches };
 }
 
-export function testRegex(pattern: string, text: string, flags: RegexFlags): RegexResult {
-  const longPattern = rejectLength(pattern, REGEX_PATTERN_MAX, '表达式超过 1 KB，请缩短后再测试。');
+export function testRegex(pattern: string, source: string, flags: RegexFlags, lang: Lang = 'zh'): RegexResult {
+  const copy = text(lang).regex;
+  const longPattern = rejectLength(pattern, REGEX_PATTERN_MAX, copy.patternTooBig);
   if (longPattern) return longPattern;
-  const longText = rejectLength(text, REGEX_TEXT_MAX, '待测文本超过 20 万字符，请缩短后再测试。');
+  const longText = rejectLength(source, REGEX_TEXT_MAX, copy.textTooBig);
   if (longText) return longText;
-  if (!pattern) return { ok: false, message: '请先填写表达式。' };
+  if (!pattern) return { ok: false, message: copy.empty };
   try {
-    return collect(new RegExp(pattern, flagText(flags)), text);
+    return collect(new RegExp(pattern, flagText(flags)), source, lang);
   } catch (err) {
-    const detail = err instanceof Error ? err.message : '无法编译';
-    return { ok: false, message: `这个表达式无法使用。${detail}` };
+    const detail = err instanceof Error ? err.message : copy.cannotCompile;
+    return { ok: false, message: fill(copy.cannot, { detail }) };
   }
 }

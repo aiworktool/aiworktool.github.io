@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import type { RegexFlags, RegexMatch, RegexResult } from '../codec/regexTool';
+import { fill } from '../i18n/lang';
 import { CodecBox } from './CodecBox';
 import { ToolPage } from './ToolPage';
+import { useI18n } from './useI18n';
 
 const EMPTY_FLAGS: RegexFlags = { global: true, ignoreCase: false, multiline: false };
 
@@ -15,6 +17,8 @@ function FlagBox({ label, checked, onToggle }: { label: string; checked: boolean
 }
 
 export default function RegexPage() {
+  const { m, lang } = useI18n();
+  const copy = m.regex;
   const [pattern, setPattern] = useState('');
   const [text, setText] = useState('');
   const [flags, setFlags] = useState<RegexFlags>(EMPTY_FLAGS);
@@ -41,14 +45,14 @@ export default function RegexPage() {
     const timer = window.setTimeout(() => {
       worker.terminate();
       setMatches(null);
-      setError('表达式可能过慢，已停止。');
+      setError(copy.slow);
     }, 800);
     worker.onmessage = (event: MessageEvent<RegexResult>) => {
       window.clearTimeout(timer);
       worker.terminate();
       apply(event.data);
     };
-    worker.postMessage({ pattern, text, flags });
+    worker.postMessage({ pattern, text, flags, lang });
   }
 
   function toggle(key: keyof RegexFlags) {
@@ -56,25 +60,27 @@ export default function RegexPage() {
   }
 
   return (
-    <ToolPage title="正则测试" note="这里是 JavaScript 正则，和 Java、Go、Python 有差异。文字只在本机处理，不上传。">
-      <CodecBox text={pattern} setText={setPattern} placeholder="表达式，例如 \\d+" label="正则表达式" compact />
-      <CodecBox text={text} setText={setText} placeholder="待测文本" label="待测文本" />
+    <ToolPage title={copy.title} note={copy.note}>
+      <CodecBox text={pattern} setText={setPattern} placeholder={copy.pattern} label={copy.patternLabel} compact />
+      <CodecBox text={text} setText={setText} placeholder={copy.text} label={copy.textLabel} />
       <div className="row">
-        <FlagBox label="全局" checked={flags.global} onToggle={() => toggle('global')} />
-        <FlagBox label="忽略大小写" checked={flags.ignoreCase} onToggle={() => toggle('ignoreCase')} />
-        <FlagBox label="多行" checked={flags.multiline} onToggle={() => toggle('multiline')} />
+        <FlagBox label={copy.global} checked={flags.global} onToggle={() => toggle('global')} />
+        <FlagBox label={copy.ignoreCase} checked={flags.ignoreCase} onToggle={() => toggle('ignoreCase')} />
+        <FlagBox label={copy.multiline} checked={flags.multiline} onToggle={() => toggle('multiline')} />
       </div>
       <div className="row">
-        <button type="button" onClick={run}>测试</button>
+        <button type="button" onClick={run}>{copy.run}</button>
       </div>
       {error && <p role="alert">{error}</p>}
-      {matches && matches.length === 0 && <p>没有匹配。</p>}
+      {matches && matches.length === 0 && <p>{copy.none}</p>}
       {matches && matches.length > 0 && (
         <ol className="match-list">
           {matches.map((match, index) => (
             <li key={`${match.text}-${index}`}>
-              {match.text || '（空匹配）'}
-              {match.groups.length > 0 && <span> 捕获：{match.groups.join('，')}</span>}
+              {match.text || copy.emptyMatch}
+              {match.groups.length > 0 && (
+                <span>{fill(copy.groups, { groups: match.groups.join(lang === 'en' ? ', ' : '，') })}</span>
+              )}
             </li>
           ))}
         </ol>

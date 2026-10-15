@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { formatBytes } from '../format';
 import { MattingClient } from '../gpu/mattingClient';
 import { ModnetNote, SiteFooter } from '../pages/SiteFooter';
+import { useI18n } from '../pages/useI18n';
 import { usePageTitle } from '../pages/usePageTitle';
 import { askPersist } from '../storage/persistStorage';
 import { initialCrop, type Rect } from './crop';
@@ -23,7 +24,9 @@ export default function MattingPage() {
   const [total, setTotal] = useState(0);
   const [cached, setCached] = useState(false);
   const [presetId, setPresetId] = useState(PRESETS[0].id);
-  usePageTitle('抠图 / 证件照');
+  const { m, to } = useI18n();
+  const copy = m.matting;
+  usePageTitle(copy.title);
   const [colorId, setColorId] = useState(DEFAULT_BACKGROUND.id);
   const [transparent, setTransparent] = useState(false);
   const [crop, setCrop] = useState<Rect | null>(null);
@@ -79,18 +82,22 @@ export default function MattingPage() {
 
   return (
     <main>
-      <p><Link to="/">返回首页</Link></p>
-      <h1>抠图 / 证件照</h1>
-      <p className="privacy">素材只在本机处理，不上传。</p>
-      {warn && <p>浏览器可能在空间不足时清除已下载的模型。</p>}
-      <FileDrop disabled={phase === 'loading' || phase === 'processing'} onFile={(file) => void onFile(file)} />
+      <p><Link to={to('/')}>{m.backHome}</Link></p>
+      <h1>{copy.title}</h1>
+      <p className="privacy">{copy.privacy}</p>
+      {warn && <p>{copy.persist}</p>}
+      <FileDrop
+        disabled={phase === 'loading' || phase === 'processing'}
+        onFile={(file) => void onFile(file)}
+        hint={copy.drop}
+      />
       {phase === 'loading' && (
         <p>
-          模型：{cached ? '已缓存，无需下载' : progressText(loaded, total)}
-          <button type="button" onClick={() => clientRef.current?.cancel()}>取消</button>
+          {copy.modelLine}{cached ? copy.cached : progressText(loaded, total)}
+          <button type="button" onClick={() => clientRef.current?.cancel()}>{copy.cancel}</button>
         </p>
       )}
-      {phase === 'processing' && <p>正在抠图…</p>}
+      {phase === 'processing' && <p>{copy.working}</p>}
       {error && <p role="alert">{error}</p>}
       {phase === 'result' && source && crop && (
         <MattingResult
@@ -119,9 +126,11 @@ function progressText(loaded: number, total: number): string {
 function FileDrop({
   disabled,
   onFile,
+  hint,
 }: {
   disabled: boolean;
   onFile: (file: File | undefined) => void;
+  hint: string;
 }) {
   return (
     <section
@@ -132,7 +141,7 @@ function FileDrop({
         if (!disabled) onFile(event.dataTransfer.files[0]);
       }}
     >
-      <p>选择一张 JPG、PNG 或 WebP，或把图片拖到这里。不超过 20 MB。</p>
+      <p>{hint}</p>
       <input
         type="file"
         accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp"

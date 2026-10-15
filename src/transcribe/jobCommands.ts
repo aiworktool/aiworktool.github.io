@@ -1,4 +1,6 @@
 import { codeOf, errorText } from '../errors';
+import { currentLang } from '../i18n/lang';
+import { text } from '../i18n/text';
 import { downloadBlob } from '../format';
 import type { TranscribeClient } from '../gpu/transcribeClient';
 import { countChunks } from './chunkAudio';
@@ -9,9 +11,6 @@ import type { LanguageMode, ModelChoice, SourceMode } from './types';
 import { MODEL_STORAGE_KEY } from './types';
 
 type Dispatch = (action: SessionAction) => void;
-
-const SMALL_WARNING =
-  '高精度模型约 460 MB，占用更多内存，低内存机器可能导致标签页崩溃。仍要切换吗？';
 
 export async function startTranscription(input: {
   client: TranscribeClient | null;
@@ -54,7 +53,8 @@ export function switchWhisperModel(input: {
   setModel: (model: ModelChoice) => void;
 }): void {
   if (input.next === input.model) return;
-  if (input.next === 'small' && !window.confirm(SMALL_WARNING)) return;
+  const warning = text(currentLang()).record.smallWarning;
+  if (input.next === 'small' && !window.confirm(warning)) return;
   const id = ++input.runId.current;
   input.client?.cancel();
   localStorage.setItem(MODEL_STORAGE_KEY, input.next);

@@ -1,3 +1,6 @@
+import type { Lang } from '../i18n/lang';
+import { text } from '../i18n/text';
+
 export const INPUT_MAX_CHARS = 200;
 export const DURATION_MAX = 100_000;
 
@@ -105,27 +108,31 @@ export function formatInZone(ms: number, timeZone: string): string {
   return `${year}-${month}-${day} ${hour}:${zonePart(parts, 'minute')}:${zonePart(parts, 'second')}`;
 }
 
-function checkRange(ms: number): { ok: true; ms: number } | Fail {
-  if (!Number.isFinite(ms)) return fail('无法识别这个时间。');
+function unknown(lang: Lang): Fail {
+  return fail(text(lang).time.unknown);
+}
+
+function checkRange(ms: number, lang: Lang): { ok: true; ms: number } | Fail {
+  if (!Number.isFinite(ms)) return unknown(lang);
   const rounded = Math.round(ms);
   if (rounded < MIN_INSTANT_MS || rounded > MAX_INSTANT_MS) {
-    return fail('这个时间超出了 1970 到 2100 年。');
+    return fail(text(lang).time.outOfRange);
   }
   return { ok: true, ms: rounded };
 }
 
-function parseTimestamp(text: string): { ok: true; ms: number } | Fail {
-  const match = NUMBER_RE.exec(text);
-  if (!match) return fail('无法识别这个时间。');
+function parseTimestamp(source: string, lang: Lang): { ok: true; ms: number } | Fail {
+  const match = NUMBER_RE.exec(source);
+  if (!match) return unknown(lang);
   const digits = match[1];
   const fraction = match[2];
-  if (digits.length > 13) return fail('无法识别这个时间。');
+  if (digits.length > 13) return unknown(lang);
   if (digits.length >= 11) {
-    if (fraction) return fail('无法识别这个时间。');
-    return checkRange(Number(digits));
+    if (fraction) return unknown(lang);
+    return checkRange(Number(digits), lang);
   }
   const extra = fraction ? Number(fraction.padEnd(3, '0')) : 0;
-  return checkRange(Number(digits) * 1000 + extra);
+  return checkRange(Number(digits) * 1000 + extra, lang);
 }
 
 function calendarMatches(
@@ -145,9 +152,9 @@ function calendarMatches(
     && date.getSeconds() === second;
 }
 
-function parseLocal(text: string): { ok: true; ms: number } | Fail {
-  const match = LOCAL_RE.exec(text);
-  if (!match) return fail('无法识别这个时间。');
+function parseLocal(source: string, lang: Lang): { ok: true; ms: number } | Fail {
+  const match = LOCAL_RE.exec(source);
+  if (!match) return unknown(lang);
   const year = Number(match[1]);
   const month = Number(match[2]);
   const day = Number(match[3]);
@@ -155,36 +162,44 @@ function parseLocal(text: string): { ok: true; ms: number } | Fail {
   const minute = Number(match[5]);
   const second = Number(match[6]);
   const millis = match[7] ? Number(match[7].padEnd(3, '0')) : 0;
-  if (month < 1 || month > 12 || hour > 23 || minute > 59 || second > 59) {
-    return fail('无法识别这个时间。');
-  }
+  if (month < 1 || month > 12 || hour > 23 || minute > 59 || second > 59) return unknown(lang);
   const date = new Date(year, month - 1, day, hour, minute, second, millis);
-  if (!calendarMatches(date, year, month, day, hour, minute, second)) {
-    return fail('无法识别这个时间。');
-  }
-  return checkRange(date.getTime());
+  if (!calendarMatches(date, year, month, day, hour, minute, second)) return unknown(lang);
+  return checkRange(date.getTime(), lang);
 }
 
-function parseIso(text: string): { ok: true; ms: number } | Fail {
-  if (!ISO_RE.test(text)) return fail('无法识别这个时间。');
-  const ms = Date.parse(text);
-  if (!Number.isFinite(ms)) return fail('无法识别这个时间。');
-  return checkRange(ms);
+function parseIso(source: string, lang: Lang): { ok: true; ms: number } | Fail {
+  if (!ISO_RE.test(source)) return unknown(lang);
+  const ms = Date.parse(source);
+  if (!Number.isFinite(ms)) return unknown(lang);
+  return checkRange(ms, lang);
 }
 
-export function parseInstant(input: string): { ok: true; ms: number } | Fail {
-  if (input.length > INPUT_MAX_CHARS) return fail('输入超过 200 个字符。');
-  const text = input.trim();
-  if (!text) return fail('请填写时间。');
-  if (NUMBER_RE.test(text)) return parseTimestamp(text);
-  const zoned = SPACED_ZONE_RE.exec(text);
-  if (zoned) return parseIso(`${zoned[1]}T${zoned[2]}${zoned[3]}`);
-  if (LOCAL_RE.test(text)) return parseLocal(text);
-  return parseIso(text);
+export function parseInstant(input: string, lang: Lang = 'zh'): { ok: true; ms: number } | Fail {
+  const copy = text(lang).time;
+  if (input.length > INPUT_MAX_CHARS) return fail(copy.tooLong);
+  const source = input.trim();
+  if (!source) return fail(copy.empty);
+  if (NUMBER_RE.test(source)) return parseTimestamp(source, lang);
+  const zoned = SPACED_ZONE_RE.exec(source);
+  if (zoned) return parseIso(`${zoned[1]}T${zoned[2]}${zoned[3]}`, lang);
+  if (LOCAL_RE.test(source)) return parseLocal(source, lang);
+  return parseIso(source, lang);
 }
 
-export function describeInstant(ms: number): InstantResult {
-  const ranged = checkRange(ms);
+function zoneList(lang: Lang): { timeZone: string; label: string }[] {
+  if (lang === 'zh') return [...ZONES];
+  const copy = text(lang).time;
+  return [
+    { timeZone: 'Asia/Shanghai', label: copy.beijing },
+    { timeZone: 'UTC', label: 'UTC' },
+    { timeZone: 'Asia/Tokyo', label: copy.tokyo },
+    { timeZone: 'America/New_York', label: copy.newYork },
+  ];
+}
+
+export function describeInstant(ms: number, lang: Lang = 'zh'): InstantResult {
+  const ranged = checkRange(ms, lang);
   if (!ranged.ok) return ranged;
   const instant = ranged.ms;
   return {
@@ -196,15 +211,18 @@ export function describeInstant(ms: number): InstantResult {
       local: formatLocal(instant),
       utc: formatUtc(instant),
       iso: new Date(instant).toISOString(),
-      zones: ZONES.map((zone) => ({ label: zone.label, text: formatInZone(instant, zone.timeZone) })),
+      zones: zoneList(lang).map((zone) => ({
+        label: zone.label,
+        text: formatInZone(instant, zone.timeZone),
+      })),
     },
   };
 }
 
-export function convertTimeInput(input: string): InstantResult {
-  const parsed = parseInstant(input);
+export function convertTimeInput(input: string, lang: Lang = 'zh'): InstantResult {
+  const parsed = parseInstant(input, lang);
   if (!parsed.ok) return parsed;
-  return describeInstant(parsed.ms);
+  return describeInstant(parsed.ms, lang);
 }
 
 export function diffInstants(startMs: number, endMs: number): DiffParts {

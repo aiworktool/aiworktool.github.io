@@ -1,0 +1,22 @@
+import { describe, expect, it } from 'vitest';
+import { comparePlainText } from './diffText';
+
+describe('comparePlainText', () => {
+  it('marks the changed character and keeps equal lines', () => {
+    const result = comparePlainText('alpha\nbeta', 'alpha\nbetb');
+    expect(result.ok && result.same).toBe(false);
+    if (!result.ok) return;
+    expect(result.rows[0]).toEqual({ left: 'alpha', right: 'alpha', changed: false });
+    expect(result.rows[1]).toEqual({ left: 'beta', right: 'betb', changed: true });
+  });
+
+  it('reports identical text without rows', () => {
+    const result = comparePlainText('same', 'same');
+    expect(result).toEqual({ ok: true, same: true, rows: [], truncated: false });
+  });
+
+  it('rejects an empty pair and an oversized side', () => {
+    expect(comparePlainText('  ', '\n').ok).toBe(false);
+    expect(comparePlainText('a'.repeat(200_001), 'a').ok).toBe(false);
+  });
+});

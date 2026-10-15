@@ -1,3 +1,6 @@
+import { currentLang } from './i18n/lang';
+import { text } from './i18n/text';
+
 export type ErrorCode =
   | 'no-webgpu'
   | 'mic-denied'
@@ -54,29 +57,26 @@ export function codeOf(err: unknown): ErrorCode {
 }
 
 export function errorText(code: ErrorCode, kind: 'audio' | 'image' = 'audio'): string {
+  const copy = text(currentLang()).errors;
   switch (code) {
     case 'no-webgpu':
-      return '当前浏览器不能使用 WebGPU。请改用桌面版 Chrome 或 Edge 113 及以上。';
+      return copy.noWebgpu;
     case 'mic-denied':
-      return '没有麦克风权限。请在浏览器的网站设置里允许麦克风，然后重新录音。';
+      return copy.mic;
     case 'file-too-big':
-      return kind === 'image'
-        ? '图片超过 20 MB，请换一张更小的图片。'
-        : '文件超过 100 MB，请换一个更小的音频。';
+      return kind === 'image' ? copy.imageBig : copy.audioBig;
     case 'audio-too-long':
-      return '音频超过 30 分钟。请先裁短后再试，这里不会截断文件。';
+      return copy.audioLong;
     case 'decode-failed':
-      return kind === 'image'
-        ? '这张图片打不开。请换一张 JPG、PNG 或 WebP。'
-        : '这个音频打不开。请换一个浏览器能播放的 mp3、wav、m4a 或 webm。';
+      return kind === 'image' ? copy.imageOpen : copy.audioOpen;
     case 'download-failed':
-      return '模型没有下载完成。请检查网络后重试。若当前是离线状态，请先联网下载一次。';
+      return copy.download;
     case 'quota':
-      return '浏览器缓存空间不足，模型没有存下来。请清理本站数据后重试。';
+      return copy.quota;
     case 'oom':
-      return '内存不足，本次处理已停止。可以关掉其他占用显卡的标签页，或改回默认模型后再试。文稿仍保留。';
+      return copy.oom;
     case 'gpu-lost':
-      return '显卡中断了这次处理。请关掉其他占用显卡的标签页后重试。已编辑的文稿仍保留。';
+      return copy.gpu;
     case 'aborted':
       return '';
   }

@@ -1,3 +1,5 @@
+import { fill, type Lang } from '../i18n/lang';
+import { text } from '../i18n/text';
 import { formatJsonText, JSON_MAX_CHARS } from './formatJson';
 
 export type CompareStatus = 'identical' | 'format-only' | 'different';
@@ -62,12 +64,13 @@ export function alignJsonLines(left: string, right: string): SideRow[] {
   return rows;
 }
 
-function boundRows(rows: SideRow[]): { rows: SideRow[]; truncated: boolean } {
+function boundRows(rows: SideRow[], lang: Lang): { rows: SideRow[]; truncated: boolean } {
   if (rows.length <= MAX_DIFF_LINES) return { rows, truncated: false };
+  const omitted = text(lang).json.omitted;
   return {
     rows: [
       ...rows.slice(0, MAX_DIFF_LINES),
-      { left: '…其余差异已省略', right: '…其余差异已省略', changed: false },
+      { left: omitted, right: omitted, changed: false },
     ],
     truncated: true,
   };
@@ -79,17 +82,18 @@ function statusOf(left: string, right: string, leftValue: unknown, rightValue: u
   return sameData ? 'format-only' : 'different';
 }
 
-export function compareJsonText(left: string, right: string): CompareOutcome {
+export function compareJsonText(left: string, right: string, lang: Lang = 'zh'): CompareOutcome {
+  const copy = text(lang).json;
   if (left.length > JSON_MAX_CHARS || right.length > JSON_MAX_CHARS) {
-    return { ok: false, message: '有一边超过 1 MB，请缩短后再比较。' };
+    return { ok: false, message: copy.compareTooBig };
   }
-  const formattedLeft = formatJsonText(left);
-  const formattedRight = formatJsonText(right);
-  if (!formattedLeft.ok) return { ok: false, message: `左边：${formattedLeft.message}` };
-  if (!formattedRight.ok) return { ok: false, message: `右边：${formattedRight.message}` };
+  const formattedLeft = formatJsonText(left, lang);
+  const formattedRight = formatJsonText(right, lang);
+  if (!formattedLeft.ok) return { ok: false, message: fill(copy.leftSide, { message: formattedLeft.message }) };
+  if (!formattedRight.ok) return { ok: false, message: fill(copy.rightSide, { message: formattedRight.message }) };
   const leftValue = JSON.parse(formattedLeft.text) as unknown;
   const rightValue = JSON.parse(formattedRight.text) as unknown;
-  const bounded = boundRows(alignJsonLines(formattedLeft.text, formattedRight.text));
+  const bounded = boundRows(alignJsonLines(formattedLeft.text, formattedRight.text), lang);
   return {
     ok: true,
     status: statusOf(formattedLeft.text, formattedRight.text, leftValue, rightValue),
@@ -100,8 +104,9 @@ export function compareJsonText(left: string, right: string): CompareOutcome {
   };
 }
 
-export function compareStatusText(status: CompareStatus): string {
-  if (status === 'identical') return '两段格式化后完全一致。';
-  if (status === 'format-only') return '数据相同，只是键的顺序不同。';
-  return '数据不同。';
+export function compareStatusText(status: CompareStatus, lang: Lang = 'zh'): string {
+  const copy = text(lang).json;
+  if (status === 'identical') return copy.identical;
+  if (status === 'format-only') return copy.formatOnly;
+  return copy.different;
 }

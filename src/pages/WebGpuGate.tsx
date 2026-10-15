@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { detectWebGpu } from '../gpu/detectWebGpu';
+import { useI18n } from './useI18n';
 import { UnsupportedPage } from './UnsupportedPage';
 
 export function useWebGpuGate(): 'checking' | 'ok' | 'no' {
@@ -17,7 +18,8 @@ export function useWebGpuGate(): 'checking' | 'ok' | 'no' {
 }
 
 export function GateScreen({ state }: { state: 'checking' | 'ok' | 'no' }) {
-  if (state === 'checking') return <p>正在检查 WebGPU…</p>;
+  const { m } = useI18n();
+  if (state === 'checking') return <p>{m.record.checking}</p>;
   if (state === 'no') return <UnsupportedPage />;
   return null;
 }

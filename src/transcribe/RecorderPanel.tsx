@@ -4,10 +4,12 @@ import { formatClock } from '../format';
 import { AUDIO_MAX_SECONDS } from './limits';
 import { loadAudioBlob } from './audioDecode';
 import { pickRecorderMime } from './recorderMime';
+import { useI18n } from '../pages/useI18n';
 import { useJob } from '../pages/jobContext';
 
 export function RecorderPanel() {
   const job = useJob();
+  const { m } = useI18n();
   const recorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const timerRef = useRef(0);
@@ -44,7 +46,7 @@ export function RecorderPanel() {
       const code = err instanceof AppFailure ? err.code : codeOf(err);
       const text = code === 'mic-denied'
         ? errorText('mic-denied')
-        : '没有可用的麦克风，或浏览器拒绝了录音。';
+        : m.record.noMic;
       job.fail(text);
     }
   }
@@ -68,11 +70,11 @@ export function RecorderPanel() {
     <section className="panel">
       <p className="timer">{formatClock(elapsed)}</p>
       {job.state.phase === 'recording' ? (
-        <button type="button" onClick={stop}>停止录音</button>
+        <button type="button" onClick={stop}>{m.record.stopRec}</button>
       ) : (
-        <button type="button" onClick={() => void start()} disabled={busy}>开始录音</button>
+        <button type="button" onClick={() => void start()} disabled={busy}>{m.record.startRec}</button>
       )}
-      {job.state.limitNote && <p>{job.state.limitNote}</p>}
+      {job.state.limitNote && <p>{m.record.limit}</p>}
     </section>
   );
 }

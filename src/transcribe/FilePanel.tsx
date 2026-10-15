@@ -1,10 +1,13 @@
 import { useState } from 'react';
 import { codeOf, errorText } from '../errors';
+import { fill } from '../i18n/lang';
 import { loadAudioBlob } from './audioDecode';
 import { useJob } from '../pages/jobContext';
+import { useI18n } from '../pages/useI18n';
 
 export function FilePanel() {
   const job = useJob();
+  const { m } = useI18n();
   const [name, setName] = useState('');
   const busy =
     job.state.phase === 'loading' ||
@@ -32,7 +35,7 @@ export function FilePanel() {
         if (!busy) void take(event.dataTransfer.files[0]);
       }}
     >
-      <p>选择一个已有录音，或把文件拖到这里。一次一个。</p>
+      <p>{m.record.drop}</p>
       <input
         type="file"
         accept="audio/*,.mp3,.wav,.m4a,.webm"
@@ -42,7 +45,7 @@ export function FilePanel() {
           event.target.value = '';
         }}
       />
-      {name && <p>已选择：{name}</p>}
+      {name && <p>{fill(m.record.selected, { name })}</p>}
     </section>
   );
 }

@@ -1,88 +1,100 @@
+import { useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { SiteFooter, ModnetNote, WhisperNote } from './SiteFooter';
 import { TimeTools } from './TimeTools';
-import { SITE_NAME, usePageTitle } from './usePageTitle';
+import { useI18n } from './useI18n';
+import { usePageTitle } from './usePageTitle';
+
+type Card = { name: string; note: string; href: string; extra?: 'whisper' | 'modnet' };
 
 export function HomePage() {
-  usePageTitle(SITE_NAME);
+  const { m, to } = useI18n();
+  const home = m.home;
+  const [query, setQuery] = useState('');
+  usePageTitle(m.siteName);
+  const hit = (name: string, note: string) => {
+    const needle = query.trim().toLowerCase();
+    return !needle || name.toLowerCase().includes(needle) || note.toLowerCase().includes(needle);
+  };
+  const showClock = hit(m.time.title, m.time.placeholder);
+  const groups = catalog(home, to);
+  const anyCard = groups.some((group) => group.cards.some((card) => hit(card.name, card.note)));
+
   return (
     <main>
-      <h1>{SITE_NAME}</h1>
-      <p className="privacy">文字、图片和音频只在这台电脑的浏览器里处理，不上传。</p>
-      <ul className="tools">
-        <li>
-          <p className="tool-group">JSON</p>
-          <div className="tool-entry">
-            <Link to="/json">JSON 格式化</Link>
-            <p>把 JSON 排成缩进，或压成一行。</p>
-          </div>
-          <div className="tool-entry">
-            <Link to="/json-diff">JSON 格式化比较</Link>
-            <p>两边分别排版，再对照数据是否相同。</p>
-          </div>
-        </li>
-      </ul>
-      <ul className="tools">
-        <li>
-          <p className="tool-group">URL 比较</p>
-          <div className="tool-entry">
-            <Link to="/url-diff">URL 参数比较</Link>
-            <p>拆开域名、路径和请求参数，逐项对照。</p>
-          </div>
-        </li>
-      </ul>
-      <ul className="tools">
-        <li>
-          <p className="tool-group">二维码</p>
-          <div className="tool-entry">
-            <Link to="/qr">二维码生成</Link>
-            <p>把文字或链接画成二维码，并下载 PNG。</p>
-          </div>
-        </li>
-      </ul>
-      <TimeTools embedded />
-      <ul className="tools">
-        <li>
-          <p className="tool-group">编码与哈希</p>
-          <div className="tool-entry">
-            <Link to="/base64">Base64</Link>
-            <p>文本和 Base64 互转，可选 URL 安全写法。</p>
-          </div>
-          <div className="tool-entry">
-            <Link to="/url">URL 编码</Link>
-            <p>把查询参数里的中文和空格编成百分号，或还原回来。</p>
-          </div>
-          <div className="tool-entry">
-            <Link to="/jwt">JWT 解码</Link>
-            <p>查看令牌的头部和载荷。不验证签名。</p>
-          </div>
-          <div className="tool-entry">
-            <Link to="/sha256">SHA-256</Link>
-            <p>计算一段文本的摘要。只出十六进制，不能解密。</p>
-          </div>
-        </li>
-        <li>
-          <Link to="/regex">正则测试</Link>
-          <p>用 JavaScript 正则看匹配和捕获组。</p>
-        </li>
-        <li>
-          <Link to="/record">录音转文字</Link>
-          <p>用麦克风录一段，停下来后再转成文稿。</p>
-          <WhisperNote />
-        </li>
-        <li>
-          <Link to="/audio-file">录音文件转文字</Link>
-          <p>选择已有的 mp3、wav、m4a 或 webm，一次一个文件。</p>
-          <WhisperNote />
-        </li>
-        <li>
-          <Link to="/matting">抠图 / 证件照</Link>
-          <p>去掉背景，换成白、蓝或红底，并裁成证件照尺寸。</p>
-          <ModnetNote />
-        </li>
-      </ul>
-      <p>录音和抠图需要桌面版 Chrome 或 Edge 113 及以上。时间、JSON、URL、二维码、编码和正则工具没有这个限制。</p>
+      <h1>{m.siteName}</h1>
+      <p className="privacy">{home.privacy}</p>
+      <label className="time-field home-search">
+        <span>{home.search}</span>
+        <input type="search" value={query} onChange={(event) => setQuery(event.target.value)} />
+      </label>
+      {groups.map((group) => (
+        <Group
+          key={group.title}
+          title={group.title}
+          cards={group.cards.filter((card) => hit(card.name, card.note))}
+          clock={group.clock && showClock ? <TimeTools embedded /> : null}
+        />
+      ))}
+      {!anyCard && !showClock && <p>{home.searchEmpty}</p>}
+      <p>{home.limit}</p>
       <SiteFooter />
     </main>
   );
+}
+
+function Group({ title, cards, clock }: { title: string; cards: Card[]; clock: ReactNode }) {
+  if (!cards.length && !clock) return null;
+  return (
+    <section>
+      <h2 className="tool-group">{title}</h2>
+      {clock}
+      {cards.length > 0 && (
+        <div className="tool-grid">
+          {cards.map((card) => <ToolCard key={card.href} card={card} />)}
+        </div>
+      )}
+    </section>
+  );
+}
+
+function ToolCard({ card }: { card: Card }) {
+  return (
+    <Link className="tool-card" to={card.href}>
+      <strong>{card.name}</strong>
+      <p>{card.note}</p>
+      {card.extra === 'whisper' && <WhisperNote />}
+      {card.extra === 'modnet' && <ModnetNote />}
+    </Link>
+  );
+}
+
+function catalog(home: ReturnType<typeof useI18n>['m']['home'], to: (path: string) => string) {
+  const card = (name: string, note: string, path: string, extra?: Card['extra']): Card => ({
+    name, note, href: to(path), extra,
+  });
+  return [
+    { title: home.jsonGroup, clock: false, cards: [
+      card(home.jsonFormat, home.jsonFormatNote, '/json'),
+      card(home.jsonDiff, home.jsonDiffNote, '/json-diff'),
+    ] },
+    { title: home.urlGroup, clock: false, cards: [card(home.urlDiff, home.urlDiffNote, '/url-diff')] },
+    { title: home.textGroup, clock: false, cards: [card(home.textDiff, home.textDiffNote, '/text-diff')] },
+    { title: home.qrGroup, clock: false, cards: [card(home.qr, home.qrNote, '/qr')] },
+    { title: home.timeGroup, clock: true, cards: [card(home.cron, home.cronNote, '/cron')] },
+    { title: home.codecGroup, clock: false, cards: [
+      card(home.base64, home.base64Note, '/base64'),
+      card(home.urlCodec, home.urlCodecNote, '/url'),
+      card(home.jwt, home.jwtNote, '/jwt'),
+      card(home.sha, home.shaNote, '/sha256'),
+      card(home.uuid, home.uuidNote, '/uuid'),
+      card(home.password, home.passwordNote, '/password'),
+      card(home.image64, home.image64Note, '/image-base64'),
+    ] },
+    { title: home.colorGroup, clock: false, cards: [card(home.color, home.colorNote, '/color')] },
+    { title: home.regex, clock: false, cards: [card(home.regex, home.regexNote, '/regex')] },
+    { title: home.record, clock: false, cards: [card(home.record, home.recordNote, '/record', 'whisper')] },
+    { title: home.file, clock: false, cards: [card(home.file, home.fileNote, '/audio-file', 'whisper')] },
+    { title: home.matting, clock: false, cards: [card(home.matting, home.mattingNote, '/matting', 'modnet')] },
+  ];
 }

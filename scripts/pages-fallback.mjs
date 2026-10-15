@@ -7,13 +7,19 @@ const index = join(dist, 'index.html');
 const routes = [
   'record', 'audio-file', 'matting', 'json', 'json-diff', 'url-diff', 'time',
   'base64', 'url', 'sha256', 'jwt', 'regex', 'qr',
+  'text-diff', 'uuid', 'password', 'image-base64', 'cron', 'color',
 ];
 
 await copyFile(index, join(dist, '404.html'));
 await writeFile(join(dist, '.nojekyll'), '');
 for (const route of routes) {
-  const dir = join(dist, route);
+  await writeRoute(join(dist, route));
+  await writeRoute(join(dist, 'en', route));
+}
+await writeRoute(join(dist, 'en'));
+console.log('wrote dist/404.html, route indexes, and dist/.nojekyll');
+
+async function writeRoute(dir) {
   await mkdir(dir, { recursive: true });
   await copyFile(index, join(dir, 'index.html'));
 }
-console.log('wrote dist/404.html, route indexes, and dist/.nojekyll');

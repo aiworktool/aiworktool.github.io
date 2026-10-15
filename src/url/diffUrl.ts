@@ -1,3 +1,6 @@
+import { fill, type Lang } from '../i18n/lang';
+import { text } from '../i18n/text';
+
 export const URL_MAX_CHARS = 100_000;
 const MAX_ROWS = 200;
 
@@ -80,16 +83,18 @@ function splitRequest(text: string): ParsedQuery {
   return { location: EMPTY_LOCATION, params: readParams(new URLSearchParams(query)) };
 }
 
-export function parseRequest(input: string): { ok: true; parsed: ParsedQuery } | { ok: false; message: string } {
-  if (input.length > URL_MAX_CHARS) {
-    return { ok: false, message: '这一边超过 10 万字符，请缩短后再比较。' };
-  }
-  const text = input.trim();
-  if (!text) return { ok: false, message: '请先粘贴 URL。' };
+export function parseRequest(
+  input: string,
+  lang: Lang = 'zh',
+): { ok: true; parsed: ParsedQuery } | { ok: false; message: string } {
+  const copy = text(lang).url;
+  if (input.length > URL_MAX_CHARS) return { ok: false, message: copy.tooBig };
+  const trimmed = input.trim();
+  if (!trimmed) return { ok: false, message: copy.empty };
   try {
-    return { ok: true, parsed: splitRequest(text) };
+    return { ok: true, parsed: splitRequest(trimmed) };
   } catch {
-    return { ok: false, message: '无法解析这个地址。' };
+    return { ok: false, message: copy.bad };
   }
 }
 
@@ -117,12 +122,13 @@ function pair(label: string, left: string | null, right: string | null): UrlRow 
   return { left: cell(label, left), right: cell(label, right), changed: left !== right };
 }
 
-export function alignLocation(left: UrlLocation, right: UrlLocation): UrlRow[] {
+export function alignLocation(left: UrlLocation, right: UrlLocation, lang: Lang = 'zh'): UrlRow[] {
+  const copy = text(lang).url;
   const rows: UrlRow[] = [];
   const fields: [string, string | null, string | null][] = [
-    ['协议', left.protocol, right.protocol],
-    ['主机', left.host, right.host],
-    ['端口', left.port, right.port],
+    [copy.protocol, left.protocol, right.protocol],
+    [copy.host, left.host, right.host],
+    [copy.port, left.port, right.port],
   ];
   for (const [label, source, target] of fields) {
     const row = pair(label, source, target);
@@ -130,7 +136,7 @@ export function alignLocation(left: UrlLocation, right: UrlLocation): UrlRow[] {
   }
   const count = Math.max(left.segments.length, right.segments.length);
   for (let index = 0; index < count; index += 1) {
-    const label = `路径${index + 1}`;
+    const label = fill(copy.path, { n: index + 1 });
     const row = pair(label, left.segments[index] ?? null, right.segments[index] ?? null);
     if (row) rows.push(row);
   }
@@ -162,10 +168,11 @@ export function alignParams(left: Param[], right: Param[]): UrlRow[] {
   return rows;
 }
 
-function boundRows(rows: UrlRow[]): { rows: UrlRow[]; truncated: boolean } {
+function boundRows(rows: UrlRow[], lang: Lang): { rows: UrlRow[]; truncated: boolean } {
   if (rows.length <= MAX_ROWS) return { rows, truncated: false };
+  const omitted = text(lang).url.omitted;
   return {
-    rows: [...rows.slice(0, MAX_ROWS), { left: '…其余参数已省略', right: '…其余参数已省略', changed: false }],
+    rows: [...rows.slice(0, MAX_ROWS), { left: omitted, right: omitted, changed: false }],
     truncated: true,
   };
 }
@@ -184,14 +191,15 @@ function statusOf(domainRows: UrlRow[], paramRows: UrlRow[]): UrlStatus {
   return 'same';
 }
 
-export function compareUrls(left: string, right: string): UrlOutcome {
-  const parsedLeft = parseRequest(left);
-  if (!parsedLeft.ok) return { ok: false, message: `左边：${parsedLeft.message}` };
-  const parsedRight = parseRequest(right);
-  if (!parsedRight.ok) return { ok: false, message: `右边：${parsedRight.message}` };
-  const domainRows = alignLocation(parsedLeft.parsed.location, parsedRight.parsed.location);
+export function compareUrls(left: string, right: string, lang: Lang = 'zh'): UrlOutcome {
+  const copy = text(lang).url;
+  const parsedLeft = parseRequest(left, lang);
+  if (!parsedLeft.ok) return { ok: false, message: fill(copy.leftSide, { message: parsedLeft.message }) };
+  const parsedRight = parseRequest(right, lang);
+  if (!parsedRight.ok) return { ok: false, message: fill(copy.rightSide, { message: parsedRight.message }) };
+  const domainRows = alignLocation(parsedLeft.parsed.location, parsedRight.parsed.location, lang);
   const paramRows = alignParams(parsedLeft.parsed.params, parsedRight.parsed.params);
-  const bounded = boundRows(paramRows);
+  const bounded = boundRows(paramRows, lang);
   return {
     ok: true,
     status: statusOf(domainRows, paramRows),
@@ -201,14 +209,15 @@ export function compareUrls(left: string, right: string): UrlOutcome {
   };
 }
 
-export function compareUrlStatusText(status: UrlStatus): string {
-  if (status === 'same') return '域名、路径和参数完全相同。';
-  if (status === 'params-same') return '请求参数完全相同。';
-  if (status === 'same-no-params') return '域名和路径相同，两边都没有请求参数。';
-  if (status === 'address') return '域名或路径不同，参数相同。';
-  if (status === 'address-no-params') return '域名或路径不同，两边都没有请求参数。';
-  if (status === 'params-domain-same') return '参数不同，域名和路径相同。';
-  if (status === 'params') return '参数不同。';
-  if (status === 'both') return '域名或路径不同，参数也不同。';
-  return '两边都没有可比较的内容。';
+export function compareUrlStatusText(status: UrlStatus, lang: Lang = 'zh'): string {
+  const copy = text(lang).url;
+  if (status === 'same') return copy.same;
+  if (status === 'params-same') return copy.paramsSame;
+  if (status === 'same-no-params') return copy.sameNoParams;
+  if (status === 'address') return copy.address;
+  if (status === 'address-no-params') return copy.addressNoParams;
+  if (status === 'params-domain-same') return copy.paramsDomainSame;
+  if (status === 'params') return copy.paramsDiffer;
+  if (status === 'both') return copy.both;
+  return copy.none;
 }

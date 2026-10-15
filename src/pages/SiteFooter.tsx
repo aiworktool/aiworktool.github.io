@@ -1,25 +1,21 @@
 import { Link } from 'react-router-dom';
+import { useI18n } from './useI18n';
 
 export function WhisperNote() {
-  return (
-    <p className="model-note">
-      语音模型：OpenAI Whisper（MIT），页面使用 Xenova/whisper-base 与可选的 Xenova/whisper-small 量化权重。
-    </p>
-  );
+  const { m } = useI18n();
+  return <p className="model-note">{m.record.whisper}</p>;
 }
 
 export function ModnetNote() {
-  return (
-    <p className="model-note">
-      抠图模型：MODNet（Apache-2.0），上游 ZHKKKe/MODNet，浏览器权重 Xenova/modnet。
-    </p>
-  );
+  const { m } = useI18n();
+  return <p className="model-note">{m.matting.note}</p>;
 }
 
 export function SiteFooter() {
+  const { m, to } = useI18n();
   return (
     <footer>
-      <p><Link to="/">便捷工具</Link></p>
+      <p><Link to={to('/')}>{m.siteName}</Link></p>
     </footer>
   );
 }

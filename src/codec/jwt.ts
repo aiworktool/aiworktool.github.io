@@ -1,3 +1,5 @@
+import { fill, type Lang } from '../i18n/lang';
+import { text } from '../i18n/text';
 import { formatLocal } from '../time/timeTools';
 import { JWT_MAX_CHARS, rejectLength } from './result';
 
@@ -17,12 +19,12 @@ function decodePart(part: string): string | null {
   }
 }
 
-function clockNote(label: string, value: unknown): string | null {
+function clockNote(label: string, value: unknown, lang: Lang): string | null {
   if (typeof value !== 'number' || !Number.isFinite(value)) return null;
   const ms = value > 1e12 ? value : value * 1000;
   const year = new Date(ms).getFullYear();
   if (year < 1970 || year > 2100) return null;
-  return `${label}：${formatLocal(ms)}`;
+  return fill(text(lang).jwt.noteLine, { label, time: formatLocal(ms) });
 }
 
 type PartResult = { ok: true; value: unknown } | { ok: false; message: string };
@@ -37,21 +39,22 @@ function readJson(text: string, badBase64: string, badJson: string): PartResult 
   }
 }
 
-export function decodeJwt(input: string): JwtResult {
-  const limited = rejectLength(input, JWT_MAX_CHARS, '这段令牌超过 64 KB，请缩短后再解码。');
+export function decodeJwt(input: string, lang: Lang = 'zh'): JwtResult {
+  const copy = text(lang);
+  const limited = rejectLength(input, JWT_MAX_CHARS, copy.jwt.tooBig);
   if (limited) return limited;
   const token = input.trim().replace(/^Bearer\s+/i, '');
-  if (!token) return { ok: false, message: '请先粘贴内容。' };
+  if (!token) return { ok: false, message: copy.pasteFirst };
   const parts = token.split('.');
-  if (parts.length !== 3) return { ok: false, message: '这不是三段式的 JWT。' };
-  const header = readJson(parts[0], '头部不是合法的 Base64URL。', '头部不是 JSON。');
+  if (parts.length !== 3) return { ok: false, message: copy.jwt.notJwt };
+  const header = readJson(parts[0], copy.jwt.headerB64, copy.jwt.headerJson);
   if (!header.ok) return header;
-  const payload = readJson(parts[1], '载荷不是合法的 Base64URL。', '载荷不是 JSON。');
+  const payload = readJson(parts[1], copy.jwt.payloadB64, copy.jwt.payloadJson);
   if (!payload.ok) return payload;
   const body = payload.value;
   const notes = [
-    clockNote('签发时间', body && typeof body === 'object' ? (body as { iat?: unknown }).iat : null),
-    clockNote('过期时间', body && typeof body === 'object' ? (body as { exp?: unknown }).exp : null),
+    clockNote(copy.jwt.issued, body && typeof body === 'object' ? (body as { iat?: unknown }).iat : null, lang),
+    clockNote(copy.jwt.expires, body && typeof body === 'object' ? (body as { exp?: unknown }).exp : null, lang),
   ].filter((note): note is string => note !== null);
   return {
     ok: true,

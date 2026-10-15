@@ -1,4 +1,5 @@
 import { copyText } from '../format';
+import { useI18n } from './useI18n';
 
 export function CodecBox({
   text,
@@ -25,12 +26,17 @@ export function CodecBox({
   );
 }
 
+function CopyLabel({ text }: { text: string }) {
+  const { m } = useI18n();
+  return <button type="button" onClick={() => void copyText(text)}>{m.copy}</button>;
+}
+
 export function CopyResult({ text }: { text: string }) {
   return (
     <>
       <pre className="json-box result-box">{text}</pre>
       <div className="row">
-        <button type="button" onClick={() => void copyText(text)}>复制</button>
+        <CopyLabel text={text} />
       </div>
     </>
   );

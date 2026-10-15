@@ -1,4 +1,6 @@
 import { downloadBlob } from '../format';
+import { useI18n } from '../pages/useI18n';
+import type { Copy } from '../i18n/zh';
 import { aspectOf, BACKGROUNDS, PRESETS, type BackgroundColor, type Preset } from './presets';
 import { exportJpeg, exportPng } from './exportImage';
 import { MattingPreview } from './MattingPreview';
@@ -25,6 +27,8 @@ export function MattingResult({
   onPreset: (id: string) => void;
   onCrop: (crop: Rect) => void;
 }) {
+  const { m } = useI18n();
+  const copy = m.matting;
   return (
     <>
       <div className="row">
@@ -35,11 +39,11 @@ export function MattingResult({
             onClick={() => onColor(item.id)}
             aria-pressed={item.id === color.id}
           >
-            {item.name}
+            {colorName(item.id, copy)}
           </button>
         ))}
         <button type="button" onClick={onTransparent} aria-pressed={transparent}>
-          查看透明底
+          {copy.transparentView}
         </button>
       </div>
       <div className="row">
@@ -50,7 +54,7 @@ export function MattingResult({
             onClick={() => onPreset(item.id)}
             aria-pressed={item.id === preset.id}
           >
-            {item.name}
+            {presetName(item.id, copy)}
           </button>
         ))}
       </div>
@@ -62,15 +66,30 @@ export function MattingResult({
         aspect={aspectOf(preset)}
         onCrop={onCrop}
       />
-      <p>参考线在裁切框内 10% 和 40% 处，只供对照，不会自动吸附。</p>
+      <p>{copy.guide}</p>
       <div className="row">
-        <button type="button" onClick={() => void savePng(source)}>下载透明 PNG</button>
+        <button type="button" onClick={() => void savePng(source)}>{copy.png}</button>
         <button type="button" onClick={() => void saveJpg(source, crop, color.hex, preset)}>
-          下载证件照 JPG
+          {copy.jpg}
         </button>
       </div>
     </>
   );
+}
+
+function colorName(id: string, copy: Copy['matting']): string {
+  if (id === 'white') return copy.white;
+  if (id === 'blue') return copy.blue;
+  if (id === 'red') return copy.red;
+  return id;
+}
+
+function presetName(id: string, copy: Copy['matting']): string {
+  if (id === '1inch') return copy.inch1;
+  if (id === 'small1') return copy.small1;
+  if (id === '2inch') return copy.inch2;
+  if (id === 'us-visa') return copy.visa;
+  return id;
 }
 
 async function savePng(source: HTMLCanvasElement): Promise<void> {

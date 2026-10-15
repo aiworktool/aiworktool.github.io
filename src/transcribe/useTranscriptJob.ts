@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
+import { currentLang } from '../i18n/lang';
+import { text } from '../i18n/text';
 import { copyText } from '../format';
 import { TranscribeClient } from '../gpu/transcribeClient';
 import { toTxt } from './exportText';
@@ -62,7 +64,7 @@ export function useTranscriptJob(mode: SourceMode) {
       dispatch({ type: 'exported' });
       setNotice(null);
     } catch {
-      setNotice('复制失败，请再试一次。');
+      setNotice(text(currentLang()).record.copyFailed);
     }
   }, [state.segments]);
 
