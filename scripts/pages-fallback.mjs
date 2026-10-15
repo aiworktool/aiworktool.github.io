@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 const dist = join(dirname(fileURLToPath(import.meta.url)), '..', 'dist');
 const index = join(dist, 'index.html');
 const routes = [
-  'record', 'audio-file', 'matting', 'json', 'json-diff', 'time',
+  'record', 'audio-file', 'matting', 'json', 'json-diff', 'url-diff', 'time',
   'base64', 'url', 'sha256', 'jwt', 'regex',
 ];
 

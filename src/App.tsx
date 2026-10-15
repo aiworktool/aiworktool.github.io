@@ -8,6 +8,7 @@ const FilePage = lazy(() => import('./pages/FilePage'));
 const MattingPage = lazy(() => import('./matting/MattingPage'));
 const JsonFormatPage = lazy(() => import('./pages/JsonFormatPage'));
 const JsonDiffPage = lazy(() => import('./pages/JsonDiffPage'));
+const UrlDiffPage = lazy(() => import('./pages/UrlDiffPage'));
 const TimePage = lazy(() => import('./pages/TimePage'));
 const Base64Page = lazy(() => import('./pages/Base64Page'));
 const UrlCodecPage = lazy(() => import('./pages/UrlCodecPage'));
@@ -65,6 +66,7 @@ export function App() {
           {toolRoute('/matting', <MattingPage />)}
           {plainRoute('/json', <JsonFormatPage />)}
           {plainRoute('/json-diff', <JsonDiffPage />)}
+          {plainRoute('/url-diff', <UrlDiffPage />)}
           {plainRoute('/time', <TimePage />)}
           {plainRoute('/base64', <Base64Page />)}
           {plainRoute('/url', <UrlCodecPage />)}

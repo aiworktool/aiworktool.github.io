@@ -22,6 +22,15 @@ export function HomePage() {
           </div>
         </li>
       </ul>
+      <ul className="tools">
+        <li>
+          <p className="tool-group">URL 比较</p>
+          <div className="tool-entry">
+            <Link to="/url-diff">URL 参数比较</Link>
+            <p>把两边的请求参数拆开，逐项对照差异。</p>
+          </div>
+        </li>
+      </ul>
       <TimeTools embedded />
       <ul className="tools">
         <li>
@@ -63,7 +72,7 @@ export function HomePage() {
           <ModnetNote />
         </li>
       </ul>
-      <p>录音和抠图需要桌面版 Chrome 或 Edge 113 及以上。时间、JSON、编码和正则工具没有这个限制。</p>
+      <p>录音和抠图需要桌面版 Chrome 或 Edge 113 及以上。时间、JSON、URL、编码和正则工具没有这个限制。</p>
       <SiteFooter />
     </main>
   );
