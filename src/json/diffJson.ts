@@ -1,8 +1,7 @@
 import { formatJsonText, JSON_MAX_CHARS } from './formatJson';
 
-export type DiffKind = 'same' | 'remove' | 'add';
-export type DiffLine = { kind: DiffKind; text: string };
 export type CompareStatus = 'identical' | 'format-only' | 'different';
+export type SideRow = { left: string; right: string; changed: boolean };
 
 export type CompareOutcome =
   | { ok: false; message: string }
@@ -11,7 +10,7 @@ export type CompareOutcome =
     status: CompareStatus;
     left: string;
     right: string;
-    lines: DiffLine[];
+    rows: SideRow[];
     truncated: boolean;
   };
 
@@ -27,7 +26,7 @@ export function sortJsonValue(value: unknown): unknown {
   return sorted;
 }
 
-export function diffLines(left: string, right: string): DiffLine[] {
+export function alignJsonLines(left: string, right: string): SideRow[] {
   const source = left.split('\n');
   const target = right.split('\n');
   let start = 0;
@@ -40,22 +39,36 @@ export function diffLines(left: string, right: string): DiffLine[] {
     endSource -= 1;
     endTarget -= 1;
   }
-  const lines: DiffLine[] = [];
-  for (let index = 0; index < start; index += 1) lines.push({ kind: 'same', text: source[index] });
-  for (let index = start; index <= endSource; index += 1) {
-    lines.push({ kind: 'remove', text: source[index] });
+  const rows: SideRow[] = [];
+  for (let index = 0; index < start; index += 1) {
+    rows.push({ left: source[index], right: target[index], changed: false });
   }
-  for (let index = start; index <= endTarget; index += 1) lines.push({ kind: 'add', text: target[index] });
-  for (let index = endSource + 1; index < source.length; index += 1) {
-    lines.push({ kind: 'same', text: source[index] });
+  const midSource = source.slice(start, endSource + 1);
+  const midTarget = target.slice(start, endTarget + 1);
+  const midLength = Math.max(midSource.length, midTarget.length);
+  for (let index = 0; index < midLength; index += 1) {
+    const leftLine = midSource[index] ?? '';
+    const rightLine = midTarget[index] ?? '';
+    rows.push({ left: leftLine, right: rightLine, changed: leftLine !== rightLine });
   }
-  return lines;
+  const tail = source.length - (endSource + 1);
+  for (let index = 0; index < tail; index += 1) {
+    rows.push({
+      left: source[endSource + 1 + index],
+      right: target[endTarget + 1 + index],
+      changed: false,
+    });
+  }
+  return rows;
 }
 
-function boundDiff(lines: DiffLine[]): { lines: DiffLine[]; truncated: boolean } {
-  if (lines.length <= MAX_DIFF_LINES) return { lines, truncated: false };
+function boundRows(rows: SideRow[]): { rows: SideRow[]; truncated: boolean } {
+  if (rows.length <= MAX_DIFF_LINES) return { rows, truncated: false };
   return {
-    lines: [...lines.slice(0, MAX_DIFF_LINES), { kind: 'same', text: '…其余差异已省略' }],
+    rows: [
+      ...rows.slice(0, MAX_DIFF_LINES),
+      { left: '…其余差异已省略', right: '…其余差异已省略', changed: false },
+    ],
     truncated: true,
   };
 }
@@ -76,13 +89,13 @@ export function compareJsonText(left: string, right: string): CompareOutcome {
   if (!formattedRight.ok) return { ok: false, message: `右边：${formattedRight.message}` };
   const leftValue = JSON.parse(formattedLeft.text) as unknown;
   const rightValue = JSON.parse(formattedRight.text) as unknown;
-  const bounded = boundDiff(diffLines(formattedLeft.text, formattedRight.text));
+  const bounded = boundRows(alignJsonLines(formattedLeft.text, formattedRight.text));
   return {
     ok: true,
     status: statusOf(formattedLeft.text, formattedRight.text, leftValue, rightValue),
     left: formattedLeft.text,
     right: formattedRight.text,
-    lines: bounded.lines,
+    rows: bounded.rows,
     truncated: bounded.truncated,
   };
 }

@@ -180,21 +180,28 @@ footer {
   gap: 12px;
 }
 
-.diff-list {
+.aligned-box {
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0;
   overflow: auto;
-  max-height: 50vh;
-  padding: 8px;
+  white-space: pre;
   background: #fffdf8;
   border: 1px solid #ddd4c4;
   border-radius: 12px;
+  padding: 8px;
 }
 
-.diff-line.add {
-  background: #e5f2ea;
+.diff-mark {
+  min-height: 1.4em;
 }
 
-.diff-line.remove {
+.diff-mark.left {
   background: #f8e4df;
+}
+
+.diff-mark.right {
+  background: #e5f2ea;
 }
 
 @media (max-width: 720px) {

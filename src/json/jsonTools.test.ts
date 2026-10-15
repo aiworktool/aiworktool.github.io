@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { compareJsonText, diffLines } from './diffJson';
+import { alignJsonLines, compareJsonText } from './diffJson';
 import { formatJsonText, JSON_MAX_CHARS } from './formatJson';
 
 describe('json format and compare', () => {
@@ -29,11 +29,10 @@ describe('json format and compare', () => {
     expect(result.ok).toBe(true);
     if (!result.ok) return;
     expect(result.status).toBe('different');
-    expect(diffLines('a\nb\nc', 'a\nx\nc').map((line) => line.kind)).toEqual([
-      'same',
-      'remove',
-      'add',
-      'same',
+    expect(alignJsonLines('{\n  "a": 1\n}', '{\n  "a": 2\n}')).toEqual([
+      { left: '{', right: '{', changed: false },
+      { left: '  "a": 1', right: '  "a": 2', changed: true },
+      { left: '}', right: '}', changed: false },
     ]);
   });
 });
