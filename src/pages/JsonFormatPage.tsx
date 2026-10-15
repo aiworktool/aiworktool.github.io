@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { copyText } from '../format';
-import { formatJsonText } from '../json/formatJson';
+import { compressJsonText, formatJsonText } from '../json/formatJson';
 import { SiteFooter } from './SiteFooter';
 import { usePageTitle } from './usePageTitle';
 
@@ -13,8 +13,8 @@ export default function JsonFormatPage() {
   const [copied, setCopied] = useState(false);
   usePageTitle(TITLE);
 
-  function format() {
-    const result = formatJsonText(text);
+  function apply(mode: 'format' | 'compress') {
+    const result = mode === 'format' ? formatJsonText(text) : compressJsonText(text);
     setCopied(false);
     if (!result.ok) {
       setError(result.message);
@@ -49,7 +49,8 @@ export default function JsonFormatPage() {
         }}
       />
       <div className="row">
-        <button type="button" onClick={format}>格式化</button>
+        <button type="button" onClick={() => apply('format')}>格式化</button>
+        <button type="button" onClick={() => apply('compress')}>压缩</button>
         <button type="button" onClick={() => void copy()}>复制</button>
       </div>
       {error && <p role="alert">{error}</p>}

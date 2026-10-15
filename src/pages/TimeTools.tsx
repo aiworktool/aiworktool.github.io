@@ -25,6 +25,7 @@ export function TimeTools({ embedded = false }: { embedded?: boolean }) {
 
   return (
     <section className={embedded ? 'panel time-module' : 'time-module'} aria-label="时间工具">
+      {embedded && <p className="tool-group">时间工具</p>}
       <input
         type="text"
         value={field.text}

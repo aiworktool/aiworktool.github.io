@@ -15,6 +15,7 @@ const UrlCodecPage = lazy(() => import('./pages/UrlCodecPage'));
 const Sha256Page = lazy(() => import('./pages/Sha256Page'));
 const JwtPage = lazy(() => import('./pages/JwtPage'));
 const RegexPage = lazy(() => import('./pages/RegexPage'));
+const QrPage = lazy(() => import('./pages/QrPage'));
 
 class AppErrorBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
   state = { failed: false };
@@ -73,6 +74,7 @@ export function App() {
           {plainRoute('/sha256', <Sha256Page />)}
           {plainRoute('/jwt', <JwtPage />)}
           {plainRoute('/regex', <RegexPage />)}
+          {plainRoute('/qr', <QrPage />)}
         </Routes>
       </BrowserRouter>
     </AppErrorBoundary>

@@ -205,6 +205,14 @@ footer,
   overflow: auto;
 }
 
+.qr-preview {
+  display: block;
+  width: 280px;
+  height: 280px;
+  margin-top: 12px;
+  background: #fff;
+}
+
 .option {
   display: inline-flex;
   align-items: center;

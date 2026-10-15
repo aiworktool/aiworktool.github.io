@@ -14,7 +14,7 @@ export function HomePage() {
           <p className="tool-group">JSON</p>
           <div className="tool-entry">
             <Link to="/json">JSON 格式化</Link>
-            <p>把挤在一行里的 JSON 排成容易阅读的缩进文本。</p>
+            <p>把 JSON 排成缩进，或压成一行。</p>
           </div>
           <div className="tool-entry">
             <Link to="/json-diff">JSON 格式化比较</Link>
@@ -28,6 +28,15 @@ export function HomePage() {
           <div className="tool-entry">
             <Link to="/url-diff">URL 参数比较</Link>
             <p>拆开域名、路径和请求参数，逐项对照。</p>
+          </div>
+        </li>
+      </ul>
+      <ul className="tools">
+        <li>
+          <p className="tool-group">二维码</p>
+          <div className="tool-entry">
+            <Link to="/qr">二维码生成</Link>
+            <p>把文字或链接画成二维码，并下载 PNG。</p>
           </div>
         </li>
       </ul>
@@ -72,7 +81,7 @@ export function HomePage() {
           <ModnetNote />
         </li>
       </ul>
-      <p>录音和抠图需要桌面版 Chrome 或 Edge 113 及以上。时间、JSON、URL、编码和正则工具没有这个限制。</p>
+      <p>录音和抠图需要桌面版 Chrome 或 Edge 113 及以上。时间、JSON、URL、二维码、编码和正则工具没有这个限制。</p>
       <SiteFooter />
     </main>
   );

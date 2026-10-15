@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { alignJsonLines, compareJsonText } from './diffJson';
-import { formatJsonText, JSON_MAX_CHARS } from './formatJson';
+import { compressJsonText, formatJsonText, JSON_MAX_CHARS } from './formatJson';
 
 describe('json format and compare', () => {
   it('pretty-prints an object with two-space indent', () => {
@@ -13,7 +13,13 @@ describe('json format and compare', () => {
     const invalid = formatJsonText('{');
     expect(invalid.ok).toBe(false);
     const huge = formatJsonText('1'.repeat(JSON_MAX_CHARS + 1));
-    expect(huge).toEqual({ ok: false, message: '这段文字超过 1 MB，请缩短后再格式化。' });
+    expect(huge).toEqual({ ok: false, message: '这段文字超过 1 MB，请缩短后再处理。' });
+  });
+
+  it('compresses json onto one line and keeps key order', () => {
+    const result = compressJsonText('{\n  "b": 1,\n  "a": [2]\n}');
+    expect(result).toEqual({ ok: true, text: '{"b":1,"a":[2]}' });
+    expect(compressJsonText('  ')).toEqual({ ok: false, message: '请先粘贴 JSON。' });
   });
 
   it('treats reordered keys as the same data', () => {
