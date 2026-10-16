@@ -26,6 +26,15 @@ const PasswordPage = lazy(() => import('./pages/PasswordPage'));
 const ImageBase64Page = lazy(() => import('./pages/ImageBase64Page'));
 const CronPage = lazy(() => import('./pages/CronPage'));
 const ColorPage = lazy(() => import('./pages/ColorPage'));
+const GuideListPage = lazy(() => import('./pages/GuideListPage'));
+const GuideArticlePage = lazy(() => import('./pages/GuideArticlePage'));
+const PlayListPage = lazy(() => import('./pages/PlayListPage'));
+const PopPage = lazy(() => import('./pages/PopPage'));
+const TapPage = lazy(() => import('./pages/TapPage'));
+const PourPage = lazy(() => import('./pages/PourPage'));
+const LotPage = lazy(() => import('./pages/LotPage'));
+const TwentyPage = lazy(() => import('./pages/TwentyPage'));
+const DropPage = lazy(() => import('./pages/DropPage'));
 
 class AppErrorBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
   state = { failed: false };
@@ -100,6 +109,15 @@ export function App() {
           {plainRoute('/image-base64', <ImageBase64Page />)}
           {plainRoute('/cron', <CronPage />)}
           {plainRoute('/color', <ColorPage />)}
+          {plainRoute('/guides', <GuideListPage />)}
+          {plainRoute('/guides/:slug', <GuideArticlePage />)}
+          {plainRoute('/play', <PlayListPage />)}
+          {plainRoute('/play/pop', <PopPage />)}
+          {plainRoute('/play/tap', <TapPage />)}
+          {plainRoute('/play/pour', <PourPage />)}
+          {plainRoute('/play/lot', <LotPage />)}
+          {plainRoute('/play/twenty', <TwentyPage />)}
+          {plainRoute('/play/drop', <DropPage />)}
         </Routes>
       </BrowserRouter>
     </AppErrorBoundary>

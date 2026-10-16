@@ -1,0 +1,259 @@
+.drop-game {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr);
+  gap: 12px 18px;
+  align-items: start;
+  margin: 8px 0 12px;
+}
+
+.drop-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.drop-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 92px;
+  min-height: 72px;
+  padding: 10px 16px;
+  border-radius: 18px;
+  background: #e07a28;
+  color: #fffdf8;
+  box-shadow: 0 4px 0 #b85e18;
+}
+
+.drop-badge strong {
+  font-size: clamp(1.7rem, 5vw, 2.6rem);
+  line-height: 0.9;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.drop-kicker {
+  margin: 0;
+  color: #1c1915;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.drop-next {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.drop-next-slot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.drop-order {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  margin-top: 8px;
+}
+
+.drop-order-label {
+  writing-mode: vertical-rl;
+}
+
+.drop-order-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.drop-order-list li {
+  display: flex;
+}
+
+.drop-stage {
+  min-width: 0;
+}
+
+.drop-shell {
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr) 16px;
+  grid-template-rows: minmax(0, 1fr) 18px;
+  width: min(100%, 560px);
+  margin: 0 auto;
+  user-select: none;
+}
+
+.drop-field {
+  position: relative;
+  grid-column: 2;
+  grid-row: 1;
+  min-height: 0;
+  background: #fffdf8;
+  overflow: hidden;
+  touch-action: none;
+  cursor: pointer;
+}
+
+.drop-wall {
+  grid-row: 1;
+  background-color: #8d5a32;
+  background-image: repeating-linear-gradient(
+    180deg,
+    rgba(255, 253, 248, 0.16) 0 3px,
+    rgba(80, 42, 18, 0.14) 3px 8px
+  );
+}
+
+.drop-wall-l {
+  grid-column: 1;
+  border-radius: 8px 0 0 0;
+}
+
+.drop-wall-r {
+  grid-column: 3;
+  border-radius: 0 8px 0 0;
+}
+
+.drop-floor {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  background-color: #7a4e2b;
+  border-radius: 0 0 14px 14px;
+  box-shadow: inset 0 3px 0 rgba(255, 253, 248, 0.18);
+}
+
+.drop-guide {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 1;
+  border-left: 2px dashed rgba(90, 62, 40, 0.45);
+  transform: translateX(-1px);
+  pointer-events: none;
+}
+
+.drop-danger {
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  z-index: 3;
+  border-top: 2px dashed #c4783a;
+  transform: translateY(-1px);
+  pointer-events: none;
+}
+
+.drop-ball {
+  position: relative;
+  display: block;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  box-shadow:
+    inset 0 -5px 0 rgba(28, 25, 21, 0.14),
+    inset 0 5px 0 rgba(255, 253, 248, 0.35),
+    0 0 0 1.5px rgba(28, 25, 21, 0.22);
+  pointer-events: none;
+}
+
+.drop-ball.in-cup {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+
+.drop-face {
+  position: absolute;
+  inset: 14%;
+  width: 72%;
+  height: 72%;
+}
+
+.drop-pop {
+  position: absolute;
+  z-index: 4;
+  display: grid;
+  place-items: center;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: rgba(255, 248, 236, 0.96);
+  box-shadow:
+    inset 0 -2px 0 rgba(28, 25, 21, 0.08),
+    0 0 0 1.5px rgba(224, 122, 40, 0.5);
+  color: #c45c12;
+  font-size: 0.78rem;
+  font-weight: 800;
+  line-height: 1;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.drop-c0 { background: #f08a24; }
+.drop-c1 { background: #2a9d8f; }
+.drop-c2 { background: #f2c14b; }
+.drop-c3 { background: #3a7bd5; }
+.drop-c4 { background: #f284b4; }
+.drop-c5 { background: #8b64d4; }
+.drop-c6 { background: #e2544a; }
+.drop-c7 { background: #3caf6c; }
+.drop-c8 { background: #e07a3a; }
+.drop-c9 { background: #4c6ed6; }
+.drop-c10 { background: #d6457a; }
+
+.drop-how {
+  margin: 8px 0;
+}
+
+.drop-status:empty {
+  display: none;
+}
+
+.drop-restart {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+@media (max-width: 720px) {
+  .drop-game {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .drop-side {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    width: 100%;
+    gap: 12px 16px;
+  }
+
+  .drop-next,
+  .drop-order {
+    margin-top: 0;
+  }
+
+  .drop-order {
+    align-items: center;
+  }
+
+  .drop-order-label {
+    writing-mode: horizontal-tb;
+  }
+
+  .drop-order-list {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+}

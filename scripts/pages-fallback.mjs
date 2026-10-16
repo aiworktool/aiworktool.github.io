@@ -8,6 +8,10 @@ const routes = [
   'record', 'audio-file', 'matting', 'json', 'json-diff', 'url-diff', 'time',
   'base64', 'url', 'sha256', 'jwt', 'regex', 'qr',
   'text-diff', 'uuid', 'password', 'image-base64', 'cron', 'color',
+  'guides',
+  'guides/honor-of-kings', 'guides/delta-force', 'guides/game-for-peace',
+  'guides/tft', 'guides/genshin', 'guides/valorant-mobile',
+  'play', 'play/pop', 'play/tap', 'play/pour', 'play/lot', 'play/twenty', 'play/drop',
 ];
 
 await copyFile(index, join(dist, '404.html'));
