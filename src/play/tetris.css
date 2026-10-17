@@ -1,0 +1,28 @@
+.tetris-top {
+  margin: 8px 0;
+}
+
+.tetris-stage {
+  display: inline-block;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.tetris-stage canvas {
+  display: block;
+  border-radius: 8px;
+  box-shadow: 0 1px 6px rgba(28, 25, 21, 0.18);
+}
+
+.tetris-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 8px 0;
+}
+
+.tetris-controls button {
+  min-width: 52px;
+  min-height: 44px;
+}

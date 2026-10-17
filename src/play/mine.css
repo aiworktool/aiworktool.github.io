@@ -1,0 +1,64 @@
+.mine-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 8px 0;
+}
+
+.mine-toolbar button {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.mine-toolbar button[aria-pressed="true"] {
+  outline: 3px solid #c4783a;
+  outline-offset: 2px;
+}
+
+.mine-board {
+  display: grid;
+  gap: 2px;
+  max-width: 520px;
+  margin: 8px 0;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.mine-cell {
+  aspect-ratio: 1;
+  min-width: 0;
+  padding: 0;
+  border: 1px solid #b9ad97;
+  border-radius: 3px;
+  background: #f3ecdc;
+  color: #1c1915;
+  font-size: clamp(10px, 2.4vw, 18px);
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.mine-cell.is-flag {
+  color: #c03a2b;
+}
+
+.mine-cell.is-revealed {
+  background: #fffdf8;
+  border-color: #ddd4c4;
+}
+
+.mine-cell.is-mine {
+  color: #1c1915;
+  background: #d8cfbc;
+}
+
+.mine-cell.n-1 { color: #2563eb; }
+.mine-cell.n-2 { color: #1f6b4a; }
+.mine-cell.n-3 { color: #c03a2b; }
+.mine-cell.n-4 { color: #3b3fa0; }
+.mine-cell.n-5 { color: #8b2f2f; }
+.mine-cell.n-6 { color: #0e7c7c; }
+.mine-cell.n-7 { color: #27272a; }
+.mine-cell.n-8 { color: #71717a; }

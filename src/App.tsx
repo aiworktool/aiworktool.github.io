@@ -35,6 +35,8 @@ const PourPage = lazy(() => import('./pages/PourPage'));
 const LotPage = lazy(() => import('./pages/LotPage'));
 const TwentyPage = lazy(() => import('./pages/TwentyPage'));
 const DropPage = lazy(() => import('./pages/DropPage'));
+const MinePage = lazy(() => import('./pages/MinePage'));
+const TetrisPage = lazy(() => import('./pages/TetrisPage'));
 
 class AppErrorBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
   state = { failed: false };
@@ -75,8 +77,8 @@ function localizedRoutes(path: string, element: ReactNode) {
     <>
       <Route path={path} element={element} />
       <Route path={`${path}/`} element={element} />
-      <Route path={`/en${path}`} element={element} />
-      <Route path={`/en${path}/`} element={element} />
+      <Route path={`/zh${path}`} element={element} />
+      <Route path={`/zh${path}/`} element={element} />
     </>
   );
 }
@@ -88,8 +90,8 @@ export function App() {
         <LangSwitch />
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/en" element={<HomePage />} />
-          <Route path="/en/" element={<HomePage />} />
+          <Route path="/zh" element={<HomePage />} />
+          <Route path="/zh/" element={<HomePage />} />
           {toolRoute('/record', <RecordPage />)}
           {toolRoute('/audio-file', <FilePage />)}
           {toolRoute('/matting', <MattingPage />)}
@@ -118,6 +120,8 @@ export function App() {
           {plainRoute('/play/lot', <LotPage />)}
           {plainRoute('/play/twenty', <TwentyPage />)}
           {plainRoute('/play/drop', <DropPage />)}
+          {plainRoute('/play/mine', <MinePage />)}
+          {plainRoute('/play/tetris', <TetrisPage />)}
         </Routes>
       </BrowserRouter>
     </AppErrorBoundary>

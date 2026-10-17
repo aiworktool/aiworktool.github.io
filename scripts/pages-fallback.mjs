@@ -11,16 +11,17 @@ const routes = [
   'guides',
   'guides/honor-of-kings', 'guides/delta-force', 'guides/game-for-peace',
   'guides/tft', 'guides/genshin', 'guides/valorant-mobile',
-  'play', 'play/pop', 'play/tap', 'play/pour', 'play/lot', 'play/twenty', 'play/drop',
+  'play', 'play/pop', 'play/tap', 'play/pour', 'play/lot', 'play/twenty', 'play/drop', 'play/mine',
+  'play/tetris',
 ];
 
 await copyFile(index, join(dist, '404.html'));
 await writeFile(join(dist, '.nojekyll'), '');
 for (const route of routes) {
   await writeRoute(join(dist, route));
-  await writeRoute(join(dist, 'en', route));
+  await writeRoute(join(dist, 'zh', route));
 }
-await writeRoute(join(dist, 'en'));
+await writeRoute(join(dist, 'zh'));
 console.log('wrote dist/404.html, route indexes, and dist/.nojekyll');
 
 async function writeRoute(dir) {

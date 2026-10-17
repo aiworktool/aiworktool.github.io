@@ -28,6 +28,14 @@ export default function PlayListPage() {
           <strong>{copy.drop.title}</strong>
           <p>{copy.drop.blurb}</p>
         </Link>
+        <Link className="tool-card" to={to('/play/mine')}>
+          <strong>{copy.mine.title}</strong>
+          <p>{copy.mine.blurb}</p>
+        </Link>
+        <Link className="tool-card" to={to('/play/tetris')}>
+          <strong>{copy.tetris.title}</strong>
+          <p>{copy.tetris.blurb}</p>
+        </Link>
       </div>
     </ToolPage>
   );
