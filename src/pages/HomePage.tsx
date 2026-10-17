@@ -80,6 +80,8 @@ function catalog(home: ReturnType<typeof useI18n>['m']['home'], to: (path: strin
     card(home.password, home.passwordNote, '/password'),
     card(home.image64, home.image64Note, '/image-base64'),
     card(home.color, home.colorNote, '/color'),
+    card(home.pdfToWord, home.pdfToWordNote, '/pdf-to-word'),
+    card(home.wordToPdf, home.wordToPdfNote, '/word-to-pdf'),
     card(home.play, home.playNote, '/play'),
     card(home.record, home.recordNote, '/record'),
     card(home.file, home.fileNote, '/audio-file'),

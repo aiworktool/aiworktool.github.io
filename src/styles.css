@@ -431,6 +431,44 @@ footer,
   border-radius: 12px;
 }
 
+.download-link {
+  display: inline-block;
+  background: #1f6b4a;
+  color: #f4f1ea;
+  border-radius: 8px;
+  padding: 8px 12px;
+  text-decoration: none;
+}
+
+.doc-preview {
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+@media print {
+  body[data-print-word] .lang-switch {
+    display: none !important;
+  }
+  body[data-print-word] {
+    background: #fff;
+  }
+  body[data-print-word] main {
+    max-width: none;
+    padding: 0;
+  }
+  body[data-print-word] main > :not(.print-only) {
+    display: none !important;
+  }
+  body[data-print-word] .print-only {
+    border: none;
+    background: #fff;
+    padding: 0;
+  }
+  body[data-print-word] .print-only h2 {
+    display: none;
+  }
+}
+
 .preview-image {
   display: block;
   max-width: 100%;

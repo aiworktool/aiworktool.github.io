@@ -26,6 +26,8 @@ const PasswordPage = lazy(() => import('./pages/PasswordPage'));
 const ImageBase64Page = lazy(() => import('./pages/ImageBase64Page'));
 const CronPage = lazy(() => import('./pages/CronPage'));
 const ColorPage = lazy(() => import('./pages/ColorPage'));
+const PdfToWordPage = lazy(() => import('./pages/PdfToWordPage'));
+const WordToPdfPage = lazy(() => import('./pages/WordToPdfPage'));
 const GuideListPage = lazy(() => import('./pages/GuideListPage'));
 const GuideArticlePage = lazy(() => import('./pages/GuideArticlePage'));
 const PlayListPage = lazy(() => import('./pages/PlayListPage'));
@@ -111,6 +113,8 @@ export function App() {
           {plainRoute('/image-base64', <ImageBase64Page />)}
           {plainRoute('/cron', <CronPage />)}
           {plainRoute('/color', <ColorPage />)}
+          {plainRoute('/pdf-to-word', <PdfToWordPage />)}
+          {plainRoute('/word-to-pdf', <WordToPdfPage />)}
           {plainRoute('/guides', <GuideListPage />)}
           {plainRoute('/guides/:slug', <GuideArticlePage />)}
           {plainRoute('/play', <PlayListPage />)}
