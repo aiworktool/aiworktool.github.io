@@ -1,6 +1,129 @@
+.twenty-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  width: 100%;
+}
+
+.twenty-page .play-status {
+  justify-content: center;
+}
+
+.twenty-page.is-pose > p {
+  margin: 4px 0;
+  max-width: 36rem;
+  font-size: 0.92rem;
+}
+
+.twenty-page.is-pose .twenty-actions {
+  margin: 4px 0 0;
+}
+
 .twenty-scroll {
   overflow-x: auto;
   max-width: 100%;
+}
+
+.twenty-scroll.is-hidden {
+  display: none;
+}
+
+.twenty-pose {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  margin: 8px 0;
+}
+
+.twenty-page.is-pose .twenty-pose {
+  margin: 4px 0;
+}
+
+.twenty-pose .time-hint {
+  max-width: 36rem;
+}
+
+.twenty-page.is-pose .twenty-pose .time-hint {
+  margin: 4px 0;
+  font-size: 0.92rem;
+}
+
+.twenty-cam {
+  --twenty-chrome: 13rem;
+  display: none;
+  position: relative;
+  width: min(100%, calc(100svh - var(--twenty-chrome)));
+  max-height: calc(100svh - var(--twenty-chrome));
+  aspect-ratio: 1 / 1;
+  margin-top: 4px;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #1c1915;
+}
+
+.twenty-cam.on {
+  display: block;
+}
+
+.twenty-cam video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scaleX(-1);
+  background: #1c1915;
+}
+
+.twenty-cam canvas,
+.twenty-zones {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.twenty-zones {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 0;
+  padding-bottom: 10px;
+  color: #fffdf8;
+  font-size: 16px;
+}
+
+.twenty-zones span {
+  background: rgba(8, 8, 8, 0.78);
+  padding: 6px 10px;
+  line-height: 1;
+}
+
+.twenty-zones span:first-child {
+  border-radius: 6px 0 0 6px;
+}
+
+.twenty-zones span:last-child {
+  border-radius: 0 6px 6px 0;
+}
+
+.twenty-zones span.active {
+  color: #1ef0d8;
+}
+
+@media (max-height: 860px) {
+  .twenty-cam {
+    --twenty-chrome: 11rem;
+  }
+}
+
+@media (max-height: 700px) {
+  .twenty-cam {
+    --twenty-chrome: 9.5rem;
+  }
 }
 
 .twenty-board {

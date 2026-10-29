@@ -6,6 +6,7 @@ import {
   dirFromKey, hasLost, hasWon, restartGame, stepGame, swipeDir, type Dir, type TwentyGame,
 } from './twentyLogic';
 import { browserTwentyStore, loadProgress, saveProgress, type TwentyProgress } from './twentyProgress';
+import { TwentyMotion } from './TwentyMotion';
 import './twenty.css';
 
 type TwentyCopy = Copy['play']['twenty'];
@@ -14,6 +15,7 @@ type GameSetter = Dispatch<SetStateAction<TwentyGame>>;
 
 export function TwentyBoard({ copy, sound }: { copy: TwentyCopy; sound: boolean }) {
   const [game, setGame] = useState(loadInitial);
+  const [poseOn, setPoseOn] = useState(false);
   const gameRef = useRef(game);
   const origin = useRef<Point | null>(null);
   const act = useRef<(dir: Dir) => void>(() => {});
@@ -27,14 +29,20 @@ export function TwentyBoard({ copy, sound }: { copy: TwentyCopy; sound: boolean 
 
   const status = statusText(copy, game);
   return (
-    <div>
+    <div className={poseOn ? 'twenty-page is-pose' : 'twenty-page'}>
       <div className="play-status">
         <strong aria-live="polite">{fill(copy.score, { n: game.score })}</strong>
         <span>{fill(copy.best, { n: game.best })}</span>
       </div>
-      <p>{copy.how}</p>
+      <p>{poseOn ? copy.poseHow : copy.how}</p>
       <p role="status">{status}</p>
-      <div className="twenty-scroll">
+      <TwentyMotion
+        copy={copy}
+        readBoard={() => gameRef.current.board}
+        onActive={setPoseOn}
+        onMove={(dir) => act.current(dir)}
+      />
+      <div className={poseOn ? 'twenty-scroll is-hidden' : 'twenty-scroll'}>
         <BoardGrid
           label={copy.board}
           board={game.board}

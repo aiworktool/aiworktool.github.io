@@ -3,10 +3,11 @@ import { fill } from '../i18n/lang';
 import type { Copy } from '../i18n/zh';
 import { playClick } from './clickTone';
 import {
-  cellsOf, dropIntervalMs, ghostY, hardDrop, movePiece, newGame, rotatePiece, tick,
+  cellsOf, dropIntervalMs, followSenseLine, ghostY, hardDrop, movePiece, newGame, rotatePiece, tick,
   TETRIS_H, TETRIS_W, type PieceId, type TetrisGame,
 } from './tetrisLogic';
 import { browserBestStore, loadBest, raiseBest, saveBest } from './playBest';
+import { TetrisMotion } from './TetrisMotion';
 import './tetris.css';
 
 type TetrisCopy = Copy['play']['tetris'];
@@ -45,6 +46,7 @@ export function TetrisBoard({ copy, sound }: { copy: TetrisCopy; sound: boolean 
   const nextRef = useRef<HTMLCanvasElement | null>(null);
   const swipe = useRef<{ x: number; y: number } | null>(null);
 
+  const [poseOn, setPoseOn] = useState(false);
   const act = useRef<TetrisActions | null>(null);
   act.current = {
     left: () => step(movePiece(gameRef.current, -1, 0), 420),
@@ -107,7 +109,7 @@ export function TetrisBoard({ copy, sound }: { copy: TetrisCopy; sound: boolean 
   const displayBest = Math.max(best, game.score);
 
   return (
-    <div>
+    <div className="tetris-board">
       <div className="tetris-top">
         <canvas
           ref={nextRef}
@@ -124,7 +126,7 @@ export function TetrisBoard({ copy, sound }: { copy: TetrisCopy; sound: boolean 
         <span>{displayBest > 0 ? fill(copy.best, { n: displayBest }) : copy.bestNone}</span>
       </div>
       <div
-        className="tetris-stage"
+        className={poseOn ? 'tetris-stage is-hidden' : 'tetris-stage'}
         onPointerDown={(event) => { swipe.current = { x: event.clientX, y: event.clientY }; }}
         onPointerUp={(event) => {
           const start = swipe.current;
@@ -147,17 +149,42 @@ export function TetrisBoard({ copy, sound }: { copy: TetrisCopy; sound: boolean 
           aria-label={copy.board}
         />
       </div>
+      <TetrisMotion
+        copy={copy}
+        readGame={() => gameRef.current}
+        onActive={setPoseOn}
+        onLine={(row) => {
+          const next = followSenseLine(gameRef.current, row);
+          if (next === gameRef.current) return;
+          gameRef.current = next;
+          setGame(next);
+        }}
+        onMove={(dir) => {
+          if (dir === 'left') act.current?.left();
+          else act.current?.right();
+        }}
+        onAction={(action) => {
+          if (action === 'rotateCcw') act.current?.rotateCcw();
+          else if (action === 'rotateCw') act.current?.rotateCw();
+          else act.current?.drop();
+        }}
+      />
       <div className="tetris-controls">
-        <button type="button" onClick={(event) => { event.currentTarget.blur(); act.current?.left(); }}>{copy.left}</button>
-        <button type="button" onClick={(event) => { event.currentTarget.blur(); act.current?.rotateCw(); }}>{copy.rotate}</button>
-        <button type="button" onClick={(event) => { event.currentTarget.blur(); act.current?.right(); }}>{copy.right}</button>
-        <button type="button" onClick={(event) => { event.currentTarget.blur(); act.current?.soft(); }}>{copy.soft}</button>
-        <button type="button" onClick={(event) => { event.currentTarget.blur(); act.current?.drop(); }}>{copy.hard}</button>
-        <button type="button" onClick={(event) => { event.currentTarget.blur(); act.current?.restart(); }}>{copy.restart}</button>
+        <button type="button" onClick={(event) => blurAnd(event, () => act.current?.left())}>{copy.left}</button>
+        <button type="button" onClick={(event) => blurAnd(event, () => act.current?.rotateCw())}>{copy.rotate}</button>
+        <button type="button" onClick={(event) => blurAnd(event, () => act.current?.right())}>{copy.right}</button>
+        <button type="button" onClick={(event) => blurAnd(event, () => act.current?.soft())}>{copy.soft}</button>
+        <button type="button" onClick={(event) => blurAnd(event, () => act.current?.drop())}>{copy.hard}</button>
+        <button type="button" onClick={(event) => blurAnd(event, () => act.current?.restart())}>{copy.restart}</button>
       </div>
       <p role="status" aria-live="polite">{game.over ? copy.over : copy.idle}</p>
     </div>
   );
+}
+
+function blurAnd(event: { currentTarget: HTMLButtonElement }, run: () => void): void {
+  event.currentTarget.blur();
+  run();
 }
 
 function fitCanvas(canvas: HTMLCanvasElement | null, width: number, height: number): CanvasRenderingContext2D | null {

@@ -3,6 +3,7 @@ dist
 public/models/**
 !public/models/.gitkeep
 public/ort
+public/pose
 public/fixtures
 .DS_Store
 前端站点.md

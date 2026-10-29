@@ -102,6 +102,24 @@ export function shuffledBag(rng: () => number): PieceId[] {
   return bag;
 }
 
+export function followSenseLine(game: TetrisGame, targetBottom: number): TetrisGame {
+  if (!game.piece || game.over) return game;
+  let next = game;
+  while (pieceBottom(next) < targetBottom) {
+    const moved = movePiece(next, 0, 1);
+    if (moved === next) break;
+    next = moved;
+  }
+  return next;
+}
+
+function pieceBottom(game: TetrisGame): number {
+  if (!game.piece) return -1;
+  let bottom = -1;
+  for (const [, y] of cellsOf(game.piece)) bottom = Math.max(bottom, y);
+  return bottom;
+}
+
 export function movePiece(game: TetrisGame, dx: number, dy: number): TetrisGame {
   if (!game.piece || game.over) return game;
   const piece = { ...game.piece, x: game.piece.x + dx, y: game.piece.y + dy };

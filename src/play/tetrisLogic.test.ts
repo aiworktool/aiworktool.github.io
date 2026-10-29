@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
-  cellsOf, clearLines, collides, dropIntervalMs, emptyBoard, ghostY, hardDrop, linePoints,
+  cellsOf, clearLines, collides, dropIntervalMs, emptyBoard, followSenseLine, ghostY, hardDrop, linePoints,
   movePiece, newGame, rotatePiece, shuffledBag, tick, TETRIS_H, TETRIS_W,
   type ActivePiece, type PieceId, type Rotation, type TetrisBoard, type TetrisGame,
 } from './tetrisLogic';
@@ -179,6 +179,16 @@ describe('tetris route', () => {
     expect(home).not.toContain('/play/tetris');
     expect(list).toContain("'/play/tetris'");
     expect(script).toContain("'play/tetris'");
+  });
+});
+
+describe('followSenseLine', () => {
+  it('lowers the piece until its bottom meets the line and does not lift it', () => {
+    const start = game(piece(2, 0, 4, 0));
+    const lowered = followSenseLine(start, 4);
+    const stayed = followSenseLine(lowered, 1);
+    expect(lowered.piece?.y).toBe(3);
+    expect(stayed.piece?.y).toBe(3);
   });
 });
 

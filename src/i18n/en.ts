@@ -503,10 +503,19 @@ export const en: Copy = {
       best: 'Best {n}',
       restart: 'Restart',
       how: 'Use the arrow keys, WASD, or swipe the board.',
+      poseHow: 'Lean left or right, or rise and squat a little to slide. '
+        + 'Return to the center before the next move.',
       win: 'You reached 2048. Keep going if you want.',
       lose: 'No more moves.',
       idle: '',
       board: '2048 board',
+      pose: 'Motion',
+      poseOff: 'Turn motion off',
+      poseOpening: 'Opening the camera…',
+      poseReady: 'Move your torso left, right, up, or down to slide. '
+        + 'Return to the center before the next move. The picture stays here.',
+      poseDenied: 'Camera permission was denied. Keys and swipes still work.',
+      poseFailed: 'Motion control could not start. Keys and swipes still work.',
     },
     drop: {
       title: 'Falling Balls',
@@ -568,6 +577,16 @@ export const en: Copy = {
       soft: 'Soft drop',
       hard: 'Hard drop',
       restart: 'Restart',
+      pose: 'Motion',
+      poseOff: 'Turn motion off',
+      poseOpening: 'Opening the camera…',
+      poseReady: 'Lift both hands a little and slide left or right to move. '
+        + 'Clap once at the chest center to rotate. Lower both hands to drop.',
+      poseDenied: 'Camera permission was denied. Keys and buttons still work.',
+      poseFailed: 'Motion control could not start. Keys and buttons still work.',
+      poseLeft: 'Move',
+      poseRight: 'Clap',
+      poseDrop: 'Drop',
     },
   },
 };
